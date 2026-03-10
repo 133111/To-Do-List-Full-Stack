@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Tester - To-Do List</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: monospace;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button.secondary {
+            background: #28a745;
+            margin-top: 10px;
+        }
+
+        button.secondary:hover {
+            background: #218838;
+        }
+
+        .result {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .status-info {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .status-info strong {
+            color: #0066cc;
+        }
+
+        .status-info.active {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .endpoints {
+            grid-column: 1 / -1;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .endpoints h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .endpoint-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+
+        .endpoint-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 13px;
+            font-family: monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .endpoint-item:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .method.post {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .method.get {
+            background: #51cf66;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .endpoints {
+                grid-column: auto;
+            }
+
+            .endpoint-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .demo-account {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 5px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        .demo-account strong {
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 API Tester - To-Do List</h1>
+
+        <div class="demo-account">
+            <strong>📝 Demo Account:</strong><br>
+            Username: <code>admin</code> | Password: <code>admin123</code><br>
+            Atau gunakan: Username: <code>tester</code> | Password: <code>tester123</code>
+        </div>
+
+        <div class="grid">
+            <!-- Authentication Section -->
+            <div class="section">
+                <h2>🔐 Authentication</h2>
+
+                <div class="form-group">
+                    <label>Status:</label>
+                    <div class="status-info" id="authStatus">
+                        Not Authenticated
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="loginUsername">Username:</label>
+                    <input type="text" id="loginUsername" placeholder="Masukkan username" value="admin">
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Password:</label>
+                    <input type="password" id="loginPassword" placeholder="Masukkan password" value="admin123">
+                </div>
+
+                <button onclick="testLogin()">Login & Get Token</button>
+
+                <div class="form-group">
+                    <label for="registerUsername">Register Username:</label>
+                    <input type="text" id="registerUsername" placeholder="Username baru">
+                </div>
+
+                <div class="form-group">
+                    <label for="registerPassword">Register Password:</label>
+                    <input type="password" id="registerPassword" placeholder="Password minimal 6 karakter">
+                </div>
+
+                <button class="secondary" onclick="testRegister()">Register</button>
+
+                <div class="result" id="authResult" style="display:none;"></div>
+            </div>
+
+            <!-- Token Management -->
+            <div class="section">
+                <h2>🔑 Token Management</h2>
+
+                <div class="form-group">
+                    <label for="tokenInput">Token (Auto-filled after login):</label>
+                    <textarea id="tokenInput" placeholder="Token akan muncul di sini setelah login"></textarea>
+                </div>
+
+                <button onclick="copyToken()">Copy Token</button>
+
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="userId">User ID:</label>
+                    <input type="text" id="userId" placeholder="Auto-filled" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" placeholder="Auto-filled" readonly>
+                </div>
+
+                <button class="secondary" onclick="clearToken()" style="background: #dc3545;">Logout</button>
+            </div>
+
+            <!-- Todo Operations -->
+            <div class="section">
+                <h2>✅ Todo Operations</h2>
+
+                <div class="form-group">
+                    <label for="todoTitle">Todo Title:</label>
+                    <input type="text" id="todoTitle" placeholder="Masukkan title">
+                </div>
+
+                <div class="form-group">
+                    <label for="todoCategory">Category:</label>
+                    <select id="todoCategory">
+                        <option value="">Pilih Category</option>
+                        <option value="Pelajaran Sekolah">Pelajaran Sekolah</option>
+                        <option value="Pemrograman Website">Pemrograman Website</option>
+                        <option value="Linux & Jaringan">Linux & Jaringan</option>
+                        <option value="Desain Grafis">Desain Grafis</option>
+                    </select>
+                </div>
+
+                <button onclick="addTodo()">Add Todo</button>
+                <button class="secondary" onclick="getTodos()">Get All Todos</button>
+
+                <div class="result" id="todoResult" style="display:none;"></div>
+            </div>
+
+            <!-- Log Operations -->
+            <div class="section">
+                <h2>📊 Log Operations</h2>
+
+                <div class="form-group">
+                    <label for="logDate">Date (YYYY-MM-DD):</label>
+                    <input type="text" id="logDate" placeholder="2026-02-06">
+                </div>
+
+                <div class="form-group">
+                    <label for="logTime">Time (HH:MM):</label>
+                    <input type="text" id="logTime" placeholder="14:30">
+                </div>
+
+                <div class="form-group">
+                    <label for="logCategory">Category:</label>
+                    <select id="logCategory">
+                        <option value="">Pilih Category</option>
+                        <option value="Pelajaran Sekolah">Pelajaran Sekolah</option>
+                        <option value="Pemrograman Website">Pemrograman Website</option>
+                        <option value="Linux & Jaringan">Linux & Jaringan</option>
+                        <option value="Desain Grafis">Desain Grafis</option>
+                    </select>
+                </div>
+
+                <button onclick="addLog()">Add Log</button>
+                <button class="secondary" onclick="getLogs()">Get All Logs</button>
+
+                <div class="form-group">
+                    <label>Log ID (untuk Delete):</label>
+                    <input type="number" id="deleteLogId" placeholder="Masukkan log ID" min="1">
+                </div>
+
+                <button class="danger" onclick="deleteLog()" style="background: #dc3545;">Delete Log</button>
+
+                <div class="result" id="logResult" style="display:none;"></div>
+            </div>
+
+            <!-- Available Endpoints -->
+            <div class="endpoints">
+                <h2>📡 Available Endpoints</h2>
+                <div class="endpoint-list">
+                    <div class="endpoint-item" onclick="alert('POST api.php?action=register')">
+                        <span class="method post">POST</span> /register
+                    </div>
+                    <div class="endpoint-item" onclick="alert('POST api.php?action=login')">
+                        <span class="method post">POST</span> /login
+                    </div>
+                    <div class="endpoint-item" onclick="alert('POST api.php?action=add_todo')">
+                        <span class="method post">POST</span> /add_todo
+                    </div>
+                    <div class="endpoint-item" onclick="alert('POST api.php?action=get_logs')">
+                        <span class="method post">POST</span> /get_logs
+                    </div>
+                    <div class="endpoint-item" onclick="alert('POST api.php?action=add_log')">
+                        <span class="method post">POST</span> /add_log
+                    </div>
+                    <div class="endpoint-item" onclick="alert('POST api.php?action=update_todo')">
+                        <span class="method post">POST</span> /update_todo
+                    </div>
+                    <div class="endpoint-item" onclick="alert('POST api.php?action=delete_todo')">
+                        <span class="method post">POST</span> /delete_todo
+                    </div>
+                    <div class="endpoint-item" onclick="alert('POST api.php?action=delete_log')">
+                        <span class="method post">POST</span> /delete_log
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Made with 💙 by Ahnaf Fathir Raihan | To-Do List API Testing Interface
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost/To-Do-List Website/api.php';
+
+        // Load token from localStorage on page load
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('authToken');
+            const userId = localStorage.getItem('userId');
+            const username = localStorage.getItem('username');
+            
+            if (token) {
+                document.getElementById('tokenInput').value = token;
+                document.getElementById('userId').value = userId;
+                document.getElementById('username').value = username;
+                updateAuthStatus(true, username);
+            }
+        });
+
+        function updateAuthStatus(authenticated, username = '') {
+            const status = document.getElementById('authStatus');
+            if (authenticated) {
+                status.textContent = `✅ Authenticated as "${username}"`;
+                status.classList.add('active');
+            } else {
+                status.textContent = '❌ Not Authenticated';
+                status.classList.remove('active');
+            }
+        }
+
+        function showResult(elementId, data, isSuccess = true) {
+            const resultEl = document.getElementById(elementId);
+            resultEl.textContent = JSON.stringify(data, null, 2);
+            resultEl.className = 'result ' + (isSuccess ? 'success' : 'error');
+            resultEl.style.display = 'block';
+        }
+
+        async function testLogin() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!username || !password) {
+                showResult('authResult', { error: 'Username dan password harus diisi' }, false);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+                showResult('authResult', result, result.success);
+
+                if (result.success) {
+                    localStorage.setItem('authToken', result.token);
+                    localStorage.setItem('userId', result.user_id);
+                    localStorage.setItem('username', result.username);
+
+                    document.getElementById('tokenInput').value = result.token;
+                    document.getElementById('userId').value = result.user_id;
+                    document.getElementById('username').value = result.username;
+
+                    updateAuthStatus(true, result.username);
+                }
+            } catch (error) {
+                showResult('authResult', { error: error.message }, false);
+            }
+        }
+
+        async function testRegister() {
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+
+            if (!username || !password) {
+                showResult('authResult', { error: 'Username dan password harus diisi' }, false);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}?action=register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+                showResult('authResult', result, result.success);
+            } catch (error) {
+                showResult('authResult', { error: error.message }, false);
+            }
+        }
+
+        function copyToken() {
+            const token = document.getElementById('tokenInput').value;
+            if (!token) {
+                alert('Tidak ada token. Login terlebih dahulu!');
+                return;
+            }
+            navigator.clipboard.writeText(token).then(() => {
+                alert('Token copied to clipboard!');
+            });
+        }
+
+        function clearToken() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('username');
+
+            document.getElementById('tokenInput').value = '';
+            document.getElementById('userId').value = '';
+            document.getElementById('username').value = '';
+
+            updateAuthStatus(false);
+            alert('Logged out!');
+        }
+
+        async function addTodo() {
+            const token = document.getElementById('tokenInput').value;
+            if (!token) {
+                alert('Please login first!');
+                return;
+            }
+
+            const title = document.getElementById('todoTitle').value;
+            const category = document.getElementById('todoCategory').value;
+
+            if (!title || !category) {
+                showResult('todoResult', { error: 'Title dan category harus diisi' }, false);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}?action=add_todo`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ title, category, description: '' })
+                });
+
+                const result = await response.json();
+                showResult('todoResult', result, result.success);
+
+                if (result.success) {
+                    document.getElementById('todoTitle').value = '';
+                    document.getElementById('todoCategory').value = '';
+                }
+            } catch (error) {
+                showResult('todoResult', { error: error.message }, false);
+            }
+        }
+
+        async function getTodos() {
+            const token = document.getElementById('tokenInput').value;
+            if (!token) {
+                alert('Please login first!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}?action=get_todos`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                showResult('todoResult', result, result.success);
+            } catch (error) {
+                showResult('todoResult', { error: error.message }, false);
+            }
+        }
+
+        async function addLog() {
+            const token = document.getElementById('tokenInput').value;
+            if (!token) {
+                alert('Please login first!');
+                return;
+            }
+
+            const log_date = document.getElementById('logDate').value;
+            const log_time = document.getElementById('logTime').value;
+            const category = document.getElementById('logCategory').value;
+
+            if (!log_date || !log_time || !category) {
+                showResult('logResult', { error: 'Semua field harus diisi' }, false);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}?action=add_log`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ log_date, log_time, category })
+                });
+
+                const result = await response.json();
+                showResult('logResult', result, result.success);
+
+                if (result.success) {
+                    document.getElementById('logDate').value = '';
+                    document.getElementById('logTime').value = '';
+                    document.getElementById('logCategory').value = '';
+                }
+            } catch (error) {
+                showResult('logResult', { error: error.message }, false);
+            }
+        }
+
+        async function getLogs() {
+            const token = document.getElementById('tokenInput').value;
+            if (!token) {
+                alert('Please login first!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}?action=get_logs`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                showResult('logResult', result, result.success);
+            } catch (error) {
+                showResult('logResult', { error: error.message }, false);
+            }
+        }
+
+        async function deleteLog() {
+            const token = document.getElementById('tokenInput').value;
+            if (!token) {
+                alert('Please login first!');
+                return;
+            }
+
+            const logId = document.getElementById('deleteLogId').value;
+            if (!logId) {
+                showResult('logResult', { error: 'Log ID harus diisi' }, false);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}?action=delete_log`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ id: parseInt(logId) })
+                });
+
+                const result = await response.json();
+                showResult('logResult', result, result.success);
+
+                if (result.success) {
+                    document.getElementById('deleteLogId').value = '';
+                }
+            } catch (error) {
+                showResult('logResult', { error: error.message }, false);
+            }
+        }
+    </script>
+</body>
+</html>

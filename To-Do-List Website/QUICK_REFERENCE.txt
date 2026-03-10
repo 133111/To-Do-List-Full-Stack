@@ -1,0 +1,236 @@
+════════════════════════════════════════════════════════════════════════════════
+                         🚀 QUICK REFERENCE CARD 🚀
+                     To-Do List Website - Ready for Testing
+════════════════════════════════════════════════════════════════════════════════
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📍 PROJECT LOCATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Folder: c:\Code\Project With Vibe Coding\To-Do-List Website
+Status: ✅ All files ready in htdocs (Apache + PHP + MySQL)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔧 SETUP CHECKLIST (5 minutes)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Step 1: Open phpMyAdmin
+  URL: http://localhost/phpmyadmin
+  Action: Create new database "todo_list"
+
+Step 2: Run db_setup.sql
+  File: db_setup.sql (in project folder)
+  How: Copy all text → Paste in phpMyAdmin SQL tab → Run
+  Result: Tables created (users, todos, activity_logs, sessions)
+
+Step 3: Run insert_test_accounts.sql
+  File: insert_test_accounts.sql (in project folder)
+  How: Copy all text → Paste in phpMyAdmin SQL tab → Run
+  Result: Test accounts created (admin/demo with tokens)
+
+Step 4: Test Applications
+  ✅ Ready to use!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🌐 APPLICATION URLs
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📝 LOGIN PAGE:
+   http://localhost/To-Do-List Website/login.html
+
+📊 DASHBOARD:
+   http://localhost/To-Do-List Website/index.html
+
+🧪 API TESTING INTERFACE:
+   http://localhost/To-Do-List Website/API_TESTING.html
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔑 TEST CREDENTIALS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ADMIN ACCOUNT:
+  Username: admin
+  Password: admin123
+  Use: Full testing access
+
+TESTER ACCOUNT:
+  Username: tester
+  Password: tester123
+  Use: Secondary user for testing
+
+OR CREATE NEW ACCOUNT via Register tab in login.html
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 QUICK TEST SCENARIOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SCENARIO 1: Test Login & Dashboard
+  1. Go to login.html
+  2. Enter: admin / admin123
+  3. Click "Login"
+  4. Verify: Redirects to index.html with greeting
+  5. Test: Add todo, add log, view charts
+
+SCENARIO 2: Test API with Tester Interface
+  1. Go to API_TESTING.html
+  2. Login with admin / admin123
+  3. Token auto-appears in "Token Management"
+  4. Test each endpoint (Add Todo, Get Logs, etc.)
+  5. Verify JSON responses
+
+SCENARIO 3: Test Data Persistence
+  1. Login as admin
+  2. Add several todos & logs
+  3. Logout
+  4. Login again as admin
+  5. Verify: All data still exists (not cleared)
+
+SCENARIO 4: Create New Account
+  1. Go to login.html
+  2. Click "Register" tab
+  3. Enter new username & password
+  4. Submit
+  5. Login with new account
+  6. Verify: Can add todos & logs independently
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📡 API ENDPOINTS SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BASE: http://localhost/To-Do-List Website/api.php
+
+Authentication (No Token):
+  POST ?action=register    → Create account
+  POST ?action=login       → Get token & user info
+
+Todos (Requires Bearer Token):
+  POST ?action=add_todo    → Create new todo
+  POST ?action=get_todos   → Retrieve all todos
+  POST ?action=update_todo → Update todo (mark complete)
+  POST ?action=delete_todo → Delete todo
+
+Logs (Requires Bearer Token):
+  POST ?action=add_log     → Create log entry
+  POST ?action=get_logs    → Retrieve all logs
+  POST ?action=delete_log  → Delete log entry
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔐 TOKEN FORMAT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Header Name: Authorization
+Format: Bearer {64-character-hex-token}
+Expiry: 7 days from creation
+
+Example:
+  Authorization: Bearer a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0
+
+To Get Token:
+  1. Use API_TESTING.html (easiest)
+  2. Login with admin/admin123
+  3. Token appears automatically in Token Management section
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 KEY FILES EXPLAINED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FRONTEND:
+  login.html              Login & Register interface
+  index.html              Main dashboard with todos & logs
+  API_TESTING.html        Interactive API testing tool
+
+BACKEND:
+  api.php                 Complete REST API (production-ready)
+  config.php              Database configuration
+
+DATABASE:
+  db_setup.sql            Create tables & structure
+  insert_test_accounts.sql  Add test users & tokens
+
+DOCUMENTATION:
+  FINAL_SUMMARY.txt       Complete project overview
+  TEST_CREDENTIALS.txt    Testing guide & reference
+  README.md               Project introduction
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ FEATURES IMPLEMENTED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ User Authentication (register, login, logout)
+✅ Bearer Token System (7-day expiry)
+✅ Todo Management (add, edit, mark complete, delete)
+✅ Activity Logging (date, time, category tracking)
+✅ Data Persistence (MySQL database)
+✅ User Data Isolation (each user sees own data only)
+✅ Statistics & Charts (Chart.js visualizations)
+✅ Responsive Design (mobile, tablet, desktop)
+✅ API Testing Interface (interactive endpoint testing)
+✅ Security (bcrypt, SQL injection prevention, input validation)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+❓ TROUBLESHOOTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+"Database Connection Failed"
+  → Start MySQL (Services > MySQL80 > Start)
+  → Verify credentials in config.php
+
+"Invalid or expired token"
+  → Login again to get fresh token
+  → Check Authorization header format
+
+"Data not saving"
+  → Verify db_setup.sql was executed
+  → Check tables exist in phpMyAdmin
+
+"Can't access login page"
+  → Verify URL: http://localhost/To-Do-List Website/login.html
+  → Check Apache is running
+  → Check file permissions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔒 SECURITY HIGHLIGHTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Passwords hashed with bcrypt (cost: 10)
+✅ SQL injection prevention (prepared statements)
+✅ Token-based authentication (RFC 6750)
+✅ User data isolation enforced
+✅ Input validation & sanitization
+✅ Session management
+✅ Error logging (not exposed to users)
+✅ CORS headers configured
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📱 TODO CATEGORIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Pelajaran Sekolah
+2. Pemrograman Website
+3. Linux & Jaringan
+4. Desain Grafis
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 CHARTS & STATISTICS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Bar charts showing logs by category
+✅ Activity table with date/time/category
+✅ Real-time statistics
+✅ Responsive chart sizing
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎨 DESIGN FEATURES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Dark purple gradient theme
+✅ Responsive sidebar
+✅ Time-based greeting (pagi/siang/sore/malam)
+✅ Smooth transitions & animations
+✅ Mobile-first responsive design
+✅ Professional color scheme
+✅ Custom footer branding
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎓 LEARNING OUTCOMES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+This project demonstrates:
+  • Full-stack web development
+  • RESTful API design
+  • Database design & optimization
+  • Authentication & security
+  • Frontend-backend integration
+  • Error handling & logging
+  • Production-ready code practices
+
+════════════════════════════════════════════════════════════════════════════════
+                    🎉 PROJECT COMPLETE & READY FOR TESTING 🎉
+════════════════════════════════════════════════════════════════════════════════
+
+Made with 💙 by Ahnaf Fathir Raihan | To-Do List Website v1.0.0

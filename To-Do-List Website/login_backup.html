@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - To-Do List</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .error-message {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            border: 1px solid #c3e6cb;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .login-info {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .login-info strong {
+            color: #333;
+        }
+
+        .login-info code {
+            background: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .login-footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>📝 To-Do List</h1>
+            <p>Kelola tugas dengan efisien</p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="switchTab('login')">🔐 Login</button>
+            <button class="tab-btn" onclick="switchTab('register')">✍️ Register</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form id="loginForm" class="form-section active">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    required 
+                    placeholder="Masukkan username"
+                    autocomplete="username"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required 
+                    placeholder="Masukkan password"
+                    autocomplete="current-password"
+                >
+            </div>
+
+            <button type="submit">Login</button>
+
+            <div class="loading" id="loginLoading">
+                <div class="spinner"></div>
+            </div>
+        </form>
+
+        <!-- REGISTER FORM -->
+        <form id="registerForm" class="form-section">
+            <div class="form-group">
+                <label for="regUsername">Username</label>
+                <input 
+                    type="text" 
+                    id="regUsername" 
+                    name="regUsername" 
+                    required 
+                    placeholder="Buat username"
+                    minlength="3"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="regPassword">Password</label>
+                <input 
+                    type="password" 
+                    id="regPassword" 
+                    name="regPassword" 
+                    required 
+                    placeholder="Buat password"
+                    minlength="6"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="regPasswordConfirm">Konfirmasi Password</label>
+                <input 
+                    type="password" 
+                    id="regPasswordConfirm" 
+                    name="regPasswordConfirm" 
+                    required 
+                    placeholder="Konfirmasi password"
+                    minlength="6"
+                >
+            </div>
+
+            <button type="submit">Register</button>
+
+            <div class="loading" id="registerLoading">
+                <div class="spinner"></div>
+            </div>
+        </form>
+
+        <div class="login-info">
+            <strong>💡 Demo Account:</strong><br>
+            Username: <code>admin</code><br>
+            Password: <code>admin123</code><br><br>
+            Atau gunakan:<br>
+            Username: <code>tester</code><br>
+            Password: <code>tester123</code><br><br>
+            Atau daftar akun baru!
+        </div>
+
+        <div class="login-footer">
+            Made with 💙 by <a href="#"><strong>Ahnaf Fathir Raihan</strong></a>
+        </div>
+    </div>
+
+    <script>
+        // API Base URL
+        const API_URL = 'http://localhost/To-Do-List Website/api.php';
+
+        // UI Functions
+        function switchTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const tabButtons = document.querySelectorAll('.tab-btn');
+
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            
+            if (tab === 'login') {
+                loginForm.classList.add('active');
+                registerForm.classList.remove('active');
+                tabButtons[0].classList.add('active');
+            } else {
+                loginForm.classList.remove('active');
+                registerForm.classList.add('active');
+                tabButtons[1].classList.add('active');
+            }
+
+            clearMessages();
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            const successEl = document.getElementById('successMessage');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            successEl.style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const errorEl = document.getElementById('errorMessage');
+            const successEl = document.getElementById('successMessage');
+            successEl.textContent = message;
+            successEl.style.display = 'block';
+            errorEl.style.display = 'none';
+        }
+
+        function clearMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        // LOGIN HANDLER
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loadingEl = document.getElementById('loginLoading');
+
+            clearMessages();
+            loadingEl.style.display = 'block';
+
+            try {
+                const response = await fetch(`${API_URL}?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const result = await response.json();
+                loadingEl.style.display = 'none';
+
+                if (result.success) {
+                    // Save token and user info
+                    localStorage.setItem('authToken', result.token);
+                    localStorage.setItem('userId', result.user_id);
+                    localStorage.setItem('username', result.username);
+                    
+                    showSuccess(result.message);
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    showError(result.message || 'Login gagal');
+                }
+            } catch (error) {
+                loadingEl.style.display = 'none';
+                showError('Error: ' + error.message);
+            }
+        });
+
+        // REGISTER HANDLER
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+            const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+            const loadingEl = document.getElementById('registerLoading');
+
+            clearMessages();
+
+            if (username.length < 3) {
+                showError('Username minimal 3 karakter');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('Password minimal 6 karakter');
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                showError('Password tidak cocok');
+                return;
+            }
+
+            loadingEl.style.display = 'block';
+
+            try {
+                const response = await fetch(`${API_URL}?action=register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const result = await response.json();
+                loadingEl.style.display = 'none';
+
+                if (result.success) {
+                    showSuccess(result.message + '. Silakan login.');
+                    document.getElementById('registerForm').reset();
+                    setTimeout(() => {
+                        switchTab('login');
+                    }, 1500);
+                } else {
+                    showError(result.message || 'Registrasi gagal');
+                }
+            } catch (error) {
+                loadingEl.style.display = 'none';
+                showError('Error: ' + error.message);
+            }
+        });
+
+        // Check if already logged in
+        window.addEventListener('load', () => {
+            if (localStorage.getItem('authToken')) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

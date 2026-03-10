@@ -1,0 +1,319 @@
+═══════════════════════════════════════════════════════════════
+  📝 PANDUAN PENGGUNA - TO-DO LIST WEBSITE
+═══════════════════════════════════════════════════════════════
+
+🎯 MULAI SEKARANG (CEPAT & MUDAH):
+
+  1️⃣  Buka folder: C:\Code\Project With Vibe Coding\To-Do-List Website
+  
+  2️⃣  Double-click file: login.html
+  
+  3️⃣  Website otomatis terbuka di browser Anda
+  
+  4️⃣  SELESAI! 🎉
+
+
+═══════════════════════════════════════════════════════════════
+  🔐 LOGIN PERTAMA KALI
+═══════════════════════════════════════════════════════════════
+
+OPSI 1 - GUNAKAN AKUN DEMO:
+
+  Username: demo
+  Password: demo123
+  
+  Klik tombol "Login"
+  ✓ Selesai! Anda masuk ke dashboard
+
+
+OPSI 2 - BUAT AKUN BARU:
+
+  1. Klik tab "Register"
+  2. Isi username (minimal 3 karakter)
+  3. Isi password (minimal 6 karakter)
+  4. Konfirmasi password
+  5. Klik "Register"
+  6. Kembali ke tab "Login"
+  7. Login dengan akun baru Anda
+
+
+═══════════════════════════════════════════════════════════════
+  📋 CARA MENGGUNAKAN DASHBOARD
+═══════════════════════════════════════════════════════════════
+
+BAGIAN 1: SIDEBAR (Menu Kiri)
+  - Klik "📝 To-Do List" → Lihat daftar tugas
+  - Klik "📊 Dashboard" → Lihat statistik & grafik
+  - Tombol "Logout" → Keluar dari akun
+
+
+BAGIAN 2: TO-DO LIST (HALAMAN UTAMA)
+  
+  Ada 4 kategori tugas:
+  
+  1. 📚 Pelajaran Sekolah
+     └─ Input di kolom → Klik "Tambah"
+     
+  2. 💻 Pemrograman Website
+     └─ Input di kolom → Klik "Tambah"
+     
+  3. 🐧 Belajar Linux dan Jaringan
+     └─ Input di kolom → Klik "Tambah"
+     
+  4. 🎨 Desain Grafis
+     └─ Input di kolom → Klik "Tambah"
+
+
+BAGIAN 3: MENGELOLA TUGAS
+
+  ✅ TANDAI SELESAI:
+     - Klik checkbox di depan tugas
+     - Tugas akan tercoret
+  
+  ❌ HAPUS TUGAS:
+     - Klik tombol "Hapus" di sebelah kanan
+  
+  📝 LIHAT TUGAS:
+     - Tugas akan hilang otomatis setelah 2 jam
+
+
+BAGIAN 4: LOG AKTIVITAS
+
+  Untuk mencatat waktu bekerja:
+  
+  1. Isi Tanggal (pilih kalender)
+  2. Isi Jam (pilih jam kerja)
+  3. Pilih Segmen To-Do (kategori)
+  4. Klik "Simpan Log"
+  
+  ✓ Data akan tersimpan di database
+
+
+BAGIAN 5: DASHBOARD
+
+  Klik tab "Dashboard" untuk melihat:
+  
+  📊 TABEL LOG AKTIVITAS:
+     - Tanggal bekerja
+     - Jam kerja
+     - Kategori apa yang dikerjakan
+  
+  📈 GRAFIK STATISTIK:
+     - Bar chart jumlah to-do per kategori
+     - Visualisasi data aktivitas Anda
+
+
+═══════════════════════════════════════════════════════════════
+  💡 TIPS & TRIK
+═══════════════════════════════════════════════════════════════
+
+✓ Simpan session Anda:
+  - Tekan Ctrl+Shift+S untuk save (Windows)
+  
+✓ Refresh halaman:
+  - Tekan F5 jika data tidak muncul
+  
+✓ Lihat data di Local Storage:
+  - Tekan F12 → Application → Local Storage
+  
+✓ Hapus semua data:
+  - Buka DevTools (F12)
+  - Console → localStorage.clear()
+  - Refresh halaman
+  
+✓ Export data sebagai JSON:
+  - Tekan F12 → Console
+  - Ketik: localStorage
+  - Copy semua data
+
+
+═══════════════════════════════════════════════════════════════
+  ⚠️ PENTING UNTUK DIKETAHUI
+═══════════════════════════════════════════════════════════════
+
+1️⃣  DATA DISIMPAN DI BROWSER
+    → Data hanya ada di komputer Anda
+    → Tidak disimpan di cloud
+    → Jika clear cache, data akan hilang
+
+2️⃣  PASSWORD DISIMPAN LOKAL
+    → Password disimpan di browser
+    → Tidak dikirim ke server
+    → Aman untuk penggunaan personal
+
+3️⃣  OTOMATIS LOGOUT
+    → Jika refresh halaman tanpa login, akan redirect
+    → Logout untuk keamanan
+
+4️⃣  TIDAK ADA NOTIFIKASI
+    → Website tidak punya notifikasi email
+    → Gunakan reminder eksternal jika perlu
+
+5️⃣  NO BACKUP OTOMATIS
+    → Backup data secara manual jika penting
+    → Jangan clear browser cache!
+
+
+═══════════════════════════════════════════════════════════════
+  🆘 TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════
+
+MASALAH: Halaman putih / tidak muncul
+SOLUSI:
+  - Pastikan file login.html ada di folder
+  - Gunakan browser terbaru (Chrome, Firefox, Edge)
+  - Tekan F5 untuk refresh
+
+MASALAH: Tidak bisa login
+SOLUSI:
+  - Cek username & password (case sensitive)
+  - Clear browser cache (Ctrl+Shift+Delete)
+  - Coba register akun baru
+
+MASALAH: Lupa password
+SOLUSI:
+  - Tidak ada fitur "Lupa Password"
+  - Register akun baru
+  - Atau clear data & mulai ulang
+
+MASALAH: Data hilang setelah tutup browser
+SOLUSI:
+  - Ini normal (Local Storage behavior)
+  - Jangan clear browser cache
+  - Untuk permanent storage, butuh server backend
+
+MASALAH: Tugas hilang tiba-tiba
+SOLUSI:
+  - Tugas hilang otomatis setelah 2 jam
+  - Catat waktu di log aktivitas sebelum hilang
+
+MASALAH: Sidebar tidak bisa di-collapse
+SOLUSI:
+  - Klik tombol ☰ di atas
+  - Di mobile, sidebar collapse otomatis
+
+MASALAH: Chart tidak muncul di dashboard
+SOLUSI:
+  - Butuh ada minimal 1 log
+  - Simpan log aktivitas dulu
+  - Refresh halaman
+
+
+═══════════════════════════════════════════════════════════════
+  📚 FILE-FILE YANG ADA
+═══════════════════════════════════════════════════════════════
+
+login.html
+  → Halaman login & register
+  → Mulai dari sini!
+
+index.html
+  → Dashboard utama to-do list
+  → Buka setelah login
+
+START.html
+  → Halaman penjelasan project
+  → Info & fitur lengkap
+
+api_tester.html
+  → Tool untuk test API
+  → Untuk developer
+
+README.md
+  → Dokumentasi teknis lengkap
+  → Untuk developer/IT
+
+SETUP.txt
+  → Panduan cepat
+  → Troubleshooting
+
+IMPLEMENTATION.txt
+  → Checklist fitur
+  → Status project
+
+config.php & auth.php
+  → Template untuk future backend
+  → Abaikan untuk sekarang
+
+
+═══════════════════════════════════════════════════════════════
+  🎓 PEMBELAJARAN DARI PROJECT INI
+═══════════════════════════════════════════════════════════════
+
+Teknologi yang digunakan:
+  ✓ HTML5
+  ✓ CSS3 (Responsive, Gradient, Animation)
+  ✓ JavaScript (Vanilla)
+  ✓ Browser Local Storage
+  ✓ Chart.js Library
+  ✓ REST API patterns (untuk future)
+
+Konsep yang dipelajari:
+  ✓ Web authentication
+  ✓ Client-side database
+  ✓ Token-based security
+  ✓ Responsive web design
+  ✓ Data visualization
+  ✓ Form validation
+  ✓ Event handling
+  ✓ Local Storage management
+
+
+═══════════════════════════════════════════════════════════════
+  🚀 UPGRADE KE VERSI PREMIUM
+═══════════════════════════════════════════════════════════════
+
+Ingin upgrade dengan fitur lebih banyak?
+
+OPSI 1: ADD BACKEND (Node.js/PHP)
+  - Database di server (MySQL/MongoDB)
+  - Multi-user collaboration
+  - Cloud sync
+  - Mobile app support
+
+OPSI 2: ADD FEATURES
+  - Email notifications
+  - Task reminders
+  - Recurring tasks
+  - Dark mode
+  - Export to PDF/Excel
+
+OPSI 3: DEPLOYMENT
+  - Host di Netlify / Vercel
+  - Custom domain
+  - SSL certificate
+  - CDN global
+
+Hubungi developer untuk opsi upgrade!
+
+
+═══════════════════════════════════════════════════════════════
+  📞 BANTUAN & SUPPORT
+═══════════════════════════════════════════════════════════════
+
+Untuk bantuan lebih lanjut:
+
+1. Baca README.md (dokumentasi lengkap)
+2. Cek SETUP.txt (troubleshooting)
+3. Buka DevTools (F12) cek error message
+4. Buka api_tester.html untuk test manual
+5. Reset dengan clear browser cache
+
+
+═══════════════════════════════════════════════════════════════
+  ✅ SEMUANYA SIAP!
+═══════════════════════════════════════════════════════════════
+
+Anda sekarang sudah siap menggunakan To-Do List Website!
+
+LANGKAH PERTAMA:
+  1. Double-click login.html
+  2. Gunakan akun demo (demo / demo123)
+  3. Mulai kelola tugas Anda
+  4. Selamat menggunakan! 🎉
+
+═══════════════════════════════════════════════════════════════
+Created: February 6, 2026
+Version: 1.0.0
+Status: READY TO USE ✅
+═══════════════════════════════════════════════════════════════

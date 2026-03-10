@@ -1,0 +1,61 @@
+🔴 ERROR FIX - SANGAT MUDAH (30 DETIK) 🔴
+
+═══════════════════════════════════════════════════════════════════════════════
+
+MASALAH:
+  Tabel "categories" tidak ada di database MySQL
+
+SOLUSI INSTANT (2 STEP):
+
+STEP 1: Buka URL ini di browser
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ http://localhost/To-Do-List Website/setup_categories.php               │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+STEP 2: Tunggu page load (harus show JSON response)
+  Expected response:
+  {
+    "success": true,
+    "message": "Database setup complete!",
+    "details": [
+      "✅ Tabel 'categories' berhasil dibuat",
+      "✅ Column 'category_id' ditambahkan ke tabel 'todos'",
+      "✅ Indexes dibuat/sudah ada (2/2)"
+    ]
+  }
+
+STEP 3: Refresh halaman index.html
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ http://localhost/To-Do-List Website/index.html                          │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+STEP 4: Test
+  - Login dengan akun Anda
+  - Klik "+ Tambah Kategori"
+  - HARUS BERHASIL! ✅
+
+═══════════════════════════════════════════════════════════════════════════════
+
+❓ ADA ERROR DI setup_categories.php?
+
+Jika masih ada error:
+  1. Pastikan URL benar: http://localhost/To-Do-List Website/setup_categories.php
+  2. Pastikan MySQL running
+  3. Pastikan database "todo_list" ada
+  4. Pastikan user MySQL bisa akses database
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ SETELAH SELESAI:
+
+Fitur kategori akan langsung jalan:
+  ✅ Tambah kategori
+  ✅ Edit kategori
+  ✅ Hapus kategori
+  ✅ Add task
+  ✅ Manage task
+  ✅ Semua bekerja!
+
+═══════════════════════════════════════════════════════════════════════════════
+
+DONE! Semudah itu! 🎉

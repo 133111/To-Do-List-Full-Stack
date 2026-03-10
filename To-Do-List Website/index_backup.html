@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List Sederhana</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {          
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f4f4f4, #e9ecef);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #343a40;
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            transition: width 0.3s ease, transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar.collapsed {
+            width: 60px;
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .sidebar.collapsed h2 {
+            display: none;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar li {
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #495057;
+            transition: background 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar li:hover {
+            background: #495057;
+        }
+
+        .sidebar li.active {
+            background: #007bff;
+        }
+
+        .sidebar .icon {
+            display: inline-block;
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .sidebar.collapsed .text {
+            display: none;
+        }
+
+        .user-section {
+            padding: 15px;
+            border-top: 1px solid #495057;
+            margin-top: auto;
+        }
+
+        .user-info {
+            color: #ddd;
+            font-size: 13px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-weight: bold;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        .toggle-btn {
+            display: none;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: #343a40;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            cursor: pointer;
+            z-index: 1001;
+            border-radius: 6px;
+            font-size: 18px;
+        }
+
+        .toggle-btn:active {
+            transform: scale(0.95);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .main-content.sidebar-open {
+            margin-left: 0;
+        }
+
+        .greeting {
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeInSlide 2s ease-out;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        @keyframes fadeInSlide {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .segment {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 20px;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .segment:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            transform: translateY(-5px);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            transition: color 0.3s ease;
+            font-size: 18px;
+        }
+
+        h2:hover {
+            color: #0056b3;
+        }
+
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 0;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px 0 0 6px;
+            transition: border-color 0.3s ease;
+            font-size: 16px;
+        }
+
+        input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 18px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 0 6px 6px 0;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            animation: fadeIn 0.5s ease;
+            word-break: break-word;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateX(-10px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+
+        li.completed {
+            text-decoration: line-through;
+            color: #888;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox {
+            margin-right: 10px;
+            transform: scale(1.2);
+            transition: transform 0.2s ease;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .checkbox:hover {
+            transform: scale(1.4);
+        }
+
+        .delete {
+            margin-left: auto;
+            color: #dc3545;
+            cursor: pointer;
+            font-weight: bold;
+            transition: color 0.3s ease, transform 0.2s ease;
+            flex-shrink: 0;
+            padding: 5px;
+        }
+
+        .delete:hover {
+            color: #c82333;
+            transform: scale(1.1);
+        }
+
+        footer {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        footer h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        footer form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        footer input, footer select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        footer button {
+            padding: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-size: 16px;
+        }
+
+        footer button:hover {
+            background: #218838;
+        }
+
+        .dashboard-footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            border-top: 1px solid #ddd;
+            color: #999;
+            font-size: 13px;
+        }
+
+        .dashboard-footer a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .dashboard-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ========== CATEGORY MANAGEMENT ========== */
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .category-header h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .add-category-btn {
+            background: #28a745;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .add-category-btn:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 500px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #333;
+            font-size: 20px;
+            border: none;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s ease;
+            padding: 0;
+            width: auto;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .modal-input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn {
+            background: #007bff;
+            color: white;
+        }
+
+        .save-btn:hover {
+            background: #0056b3;
+        }
+
+        .cancel-btn {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .cancel-btn:hover {
+            background: #c0c0c0;
+        }
+
+        /* Category Edit Button */
+        .segment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .segment-header h2 {
+            margin: 0;
+            flex: 1;
+        }
+
+        .category-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .edit-category-btn, .delete-category-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .edit-category-btn {
+            background: #ffc107;
+            color: white;
+        }
+
+        .edit-category-btn:hover {
+            background: #e0a800;
+        }
+
+        .delete-category-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .delete-category-btn:hover {
+            background: #c82333;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .category-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .category-header h1 {
+                font-size: 18px;
+            }
+
+            .add-category-btn {
+                width: 100%;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .segment-header {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .category-actions {
+                width: 100%;
+            }
+
+            .edit-category-btn, .delete-category-btn {
+                flex: 1;
+            }
+        }
+
+        .dashboard-view {
+            display: none;
+        }
+
+        .dashboard-view h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .dashboard-view h2 {
+            font-size: 18px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-view table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .dashboard-view th, .dashboard-view td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        .dashboard-view th {
+            background: #007bff;
+            color: white;
+        }
+
+        .dashboard-view canvas {
+            max-width: 100%;
+            height: 300px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Tablet (768px to 1024px) */
+        @media (max-width: 1024px) {
+            .greeting {
+                font-size: 22px;
+            }
+
+            .segment {
+                padding: 15px;
+            }
+
+            h2 {
+                font-size: 16px;
+            }
+        }
+
+        /* Mobile (max-width: 768px) */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: fixed;
+                top: 60px;
+                left: 0;
+                right: 0;
+                max-height: 0;
+                overflow: hidden;
+                padding: 0;
+                z-index: 999;
+                transition: max-height 0.3s ease;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            }
+
+            .sidebar.open {
+                max-height: 500px;
+                padding: 20px;
+            }
+
+            .sidebar.collapsed {
+                width: 100%;
+                max-height: 0;
+            }
+
+            .sidebar.collapsed.open {
+                max-height: 500px;
+                padding: 20px;
+            }
+
+            .sidebar h2 {
+                display: block;
+                margin-bottom: 15px;
+            }
+
+            .sidebar.collapsed h2 {
+                display: block;
+            }
+
+            .sidebar.collapsed .text {
+                display: inline;
+            }
+
+            .sidebar li {
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            .toggle-btn {
+                display: block;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+            }
+
+            .main-content {
+                width: 100%;
+                padding: 80px 15px 20px 15px;
+                margin-left: 0;
+                padding-top: 70px;
+            }
+
+            .greeting {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+
+            .container {
+                gap: 15px;
+            }
+
+            .segment {
+                padding: 15px;
+                border-radius: 8px;
+            }
+
+            .segment:hover {
+                transform: none;
+            }
+
+            h2 {
+                font-size: 16px;
+                margin-bottom: 15px;
+            }
+
+            .input-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            input[type="text"] {
+                width: 100%;
+                border-radius: 6px;
+                min-width: auto;
+            }
+
+            button {
+                width: 100%;
+                border-radius: 6px;
+                padding: 14px;
+                font-size: 16px;
+            }
+
+            button:hover {
+                transform: none;
+            }
+
+            li {
+                padding: 10px;
+                font-size: 14px;
+                flex-wrap: wrap;
+            }
+
+            .delete {
+                margin-left: auto;
+                padding: 8px 12px;
+            }
+
+            footer {
+                padding: 15px;
+                margin-top: 15px;
+            }
+
+            footer h3 {
+                font-size: 16px;
+            }
+
+            footer input, footer select {
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            footer button {
+                padding: 14px;
+                width: 100%;
+            }
+
+            .dashboard-view h1 {
+                font-size: 20px;
+                margin-bottom: 20px;
+            }
+
+            .dashboard-view h2 {
+                font-size: 16px;
+            }
+
+            .dashboard-view th, .dashboard-view td {
+                padding: 8px;
+                font-size: 12px;
+            }
+
+            .dashboard-view canvas {
+                height: 250px;
+            }
+
+            .chart-container {
+                padding: 15px;
+            }
+        }
+
+        /* Small mobile (max-width: 480px) */
+        @media (max-width: 480px) {
+            body {
+                font-size: 14px;
+            }
+
+            .toggle-btn {
+                padding: 10px 12px;
+                font-size: 16px;
+            }
+
+            .main-content {
+                padding: 70px 12px 15px 12px;
+                padding-top: 65px;
+            }
+
+            .greeting {
+                font-size: 18px;
+            }
+
+            .segment {
+                padding: 12px;
+            }
+
+            h2 {
+                font-size: 15px;
+            }
+
+            input[type="text"] {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            button {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            li {
+                padding: 8px;
+                font-size: 13px;
+            }
+
+            .delete {
+                font-size: 12px;
+            }
+
+            footer input, footer select {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .dashboard-view th, .dashboard-view td {
+                padding: 6px;
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+    <div class="sidebar" id="sidebar">
+        <h2>Navigasi</h2>
+        <ul>
+            <li class="active" onclick="showView('todo')">
+                <span class="icon">📝</span><span class="text">To-Do List</span>
+            </li>
+            <li onclick="showView('dashboard')">
+                <span class="icon">📊</span><span class="text">Dashboard</span>
+            </li>
+        </ul>
+        <div class="user-section">
+            <div class="user-info">
+                👤 <span id="username-display">User</span>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </div>
+    <div class="main-content" id="main-content">
+        <div id="todo-view">
+            <div class="greeting" id="greeting"></div>
+            <div class="container">
+                <!-- Category Management Header -->
+                <div class="category-header">
+                    <h1>📚 Kategori To-Do List Saya</h1>
+                    <button class="add-category-btn" onclick="openAddCategoryModal()">+ Tambah Kategori</button>
+                </div>
+
+                <!-- Dynamic Categories Container -->
+                <div id="categories-container"></div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="segment" style="display: none;">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div class="empty-state-text">Belum ada kategori. Mulai dengan menambah kategori baru!</div>
+                        <button class="add-category-btn" onclick="openAddCategoryModal()">Buat Kategori Pertama</button>
+                    </div>
+                </div>
+            </div>
+            <footer>
+                <h3>Log Aktivitas To-Do</h3>
+                <form id="log-form">
+                    <input type="date" id="log-date" required>
+                    <input type="time" id="log-time" required>
+                    <select id="log-segment" required>
+                        <option value="">Pilih Segmen To-Do</option>
+                    </select>
+                    <button type="submit">Simpan Log</button>
+                </form>
+            </footer>
+        </div>
+        <div id="dashboard-view" class="dashboard-view">
+            <h1>Dashboard Monitoring To-Do List</h1>
+            <h2>Data Log Aktivitas</h2>
+            <table id="log-table">
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Jam</th>
+                        <th>Segmen</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <h2>Grafik Jumlah To-Do per Segmen</h2>
+            <canvas id="chart"></canvas>
+
+            <div class="dashboard-footer">
+                Made with 💙 by <a href="#"><strong>Ahnaf Fathir Raihan</strong></a>
+            </div>
+        </div>
+
+        <div class="dashboard-footer">
+            Made with 💙 by <a href="#"><strong>Ahnaf Fathir Raihan</strong></a>
+        </div>
+    </div>
+
+    <!-- Modal: Add/Edit Category -->
+    <div id="category-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Tambah Kategori Baru</h2>
+                <button class="close-btn" onclick="closeCategoryModal()">&times;</button>
+            </div>
+            <input 
+                type="text" 
+                id="category-name-input" 
+                class="modal-input" 
+                placeholder="Masukkan nama kategori..."
+                maxlength="50"
+            >
+            <input 
+                type="text" 
+                id="category-emoji-input" 
+                class="modal-input" 
+                placeholder="Emoji atau icon (opsional)"
+                maxlength="3"
+                value="📝"
+            >
+            <div class="modal-buttons">
+                <button class="cancel-btn" onclick="closeCategoryModal()">Batal</button>
+                <button class="save-btn" id="save-category-btn" onclick="saveCategory()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost/To-Do-List Website/api.php';
+        let currentChart = null;
+        let categories = [];
+        let editingCategoryId = null;
+
+        // ============ AUTENTIKASI ============
+        async function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const userId = localStorage.getItem('userId');
+            const username = localStorage.getItem('username');
+            
+            if (!token || !userId || !username) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            document.getElementById('username-display').textContent = username;
+            setGreeting();
+            loadCategories();
+        }
+
+        function logout() {
+            if (confirm('Apakah Anda yakin ingin logout?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('username');
+                window.location.href = 'login.html';
+            }
+        }
+
+        window.addEventListener('load', checkAuth);
+
+        // ============ GREETING ============
+        function setGreeting() {
+            const now = new Date();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            const time = hour + minute / 60;
+            let timeOfDay;
+            if (time >= 0 && time <= 10) {
+                timeOfDay = 'pagi';
+            } else if (time > 10 && time <= 15) {
+                timeOfDay = 'siang';
+            } else if (time > 15 && time <= 16) {
+                timeOfDay = 'sore';
+            } else {
+                timeOfDay = 'malam';
+            }
+            const username = localStorage.getItem('username') || 'User';
+            document.getElementById('greeting').textContent = `Selamat ${timeOfDay} ${username}`;
+        }
+
+        // ============ CATEGORY MANAGEMENT ============
+        async function loadCategories() {
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                const response = await fetch(`${API_URL}?action=get_categories`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    categories = result.categories || [];
+                    renderCategories();
+                    updateLogSegmentOptions();
+                } else {
+                    categories = [];
+                    renderEmptyState();
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                renderEmptyState();
+            }
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categories-container');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (!categories || categories.length === 0) {
+                container.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            container.innerHTML = '';
+
+            categories.forEach(category => {
+                const segment = document.createElement('div');
+                segment.className = 'segment';
+                segment.dataset.categoryId = category.id;
+                
+                const categoryId = category.id;
+                const emoji = category.emoji || '📝';
+                const name = category.name;
+
+                segment.innerHTML = `
+                    <div class="segment-header">
+                        <h2>${emoji} ${name}</h2>
+                        <div class="category-actions">
+                            <button class="edit-category-btn" onclick="openEditCategoryModal(${categoryId}, '${name.replace(/'/g, "\\'")}', '${emoji}')">✏️ Edit</button>
+                            <button class="delete-category-btn" onclick="deleteCategory(${categoryId})">🗑️ Hapus</button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="task-input" data-category-id="${categoryId}" placeholder="Tambah tugas...">
+                        <button onclick="addTask(${categoryId})">Tambah</button>
+                    </div>
+                    <ul class="task-list" data-category-id="${categoryId}"></ul>
+                `;
+
+                container.appendChild(segment);
+                loadTasksForCategory(categoryId);
+            });
+        }
+
+        function renderEmptyState() {
+            const container = document.getElementById('categories-container');
+            const emptyState = document.getElementById('empty-state');
+            container.innerHTML = '';
+            emptyState.style.display = 'block';
+        }
+
+        // ============ MODAL FUNCTIONS ============
+        function openAddCategoryModal() {
+            editingCategoryId = null;
+            document.getElementById('modal-title').textContent = 'Tambah Kategori Baru';
+            document.getElementById('category-name-input').value = '';
+            document.getElementById('category-emoji-input').value = '📝';
+            document.getElementById('save-category-btn').onclick = saveCategory;
+            document.getElementById('category-modal').classList.add('show');
+            document.getElementById('category-name-input').focus();
+        }
+
+        function openEditCategoryModal(id, name, emoji) {
+            editingCategoryId = id;
+            document.getElementById('modal-title').textContent = 'Edit Kategori';
+            document.getElementById('category-name-input').value = name;
+            document.getElementById('category-emoji-input').value = emoji;
+            document.getElementById('category-modal').classList.add('show');
+            document.getElementById('category-name-input').focus();
+        }
+
+        function closeCategoryModal() {
+            document.getElementById('category-modal').classList.remove('show');
+            editingCategoryId = null;
+        }
+
+        async function saveCategory() {
+            const name = document.getElementById('category-name-input').value.trim();
+            const emoji = document.getElementById('category-emoji-input').value.trim() || '📝';
+            const token = localStorage.getItem('authToken');
+
+            if (!name) {
+                alert('Nama kategori tidak boleh kosong');
+                return;
+            }
+
+            try {
+                const action = editingCategoryId ? 'update_category' : 'add_category';
+                const body = editingCategoryId 
+                    ? { id: editingCategoryId, name, emoji }
+                    : { name, emoji };
+
+                const response = await fetch(`${API_URL}?action=${action}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    closeCategoryModal();
+                    loadCategories();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error menyimpan kategori: ' + error.message);
+            }
+        }
+
+        async function deleteCategory(categoryId) {
+            if (!confirm('Apakah Anda yakin ingin menghapus kategori ini? Semua task di kategori ini akan dihapus.')) {
+                return;
+            }
+
+            const token = localStorage.getItem('authToken');
+
+            try {
+                const response = await fetch(`${API_URL}?action=delete_category`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ id: categoryId })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    loadCategories();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error menghapus kategori: ' + error.message);
+            }
+        }
+
+        // ============ TODO MANAGEMENT ============
+        async function loadTasksForCategory(categoryId) {
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                const response = await fetch(`${API_URL}?action=get_todos&category_id=${categoryId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    const list = document.querySelector(`.task-list[data-category-id="${categoryId}"]`);
+                    list.innerHTML = '';
+                    
+                    result.todos.forEach(todo => {
+                        const li = document.createElement('li');
+                        if (todo.completed) li.classList.add('completed');
+                        li.dataset.id = todo.id;
+                        li.innerHTML = `
+                            <input type="checkbox" class="checkbox" ${todo.completed ? 'checked' : ''} onclick="toggleComplete(this, ${todo.id})">
+                            <span>${todo.title}</span>
+                            <span class="delete" onclick="deleteTask(this, ${todo.id})">Hapus</span>
+                        `;
+                        list.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+            }
+        }
+
+        async function addTask(categoryId) {
+            const input = document.querySelector(`.task-input[data-category-id="${categoryId}"]`);
+            const list = document.querySelector(`.task-list[data-category-id="${categoryId}"]`);
+            
+            if (input.value.trim() === '') return;
+
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                const response = await fetch(`${API_URL}?action=add_todo`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        title: input.value,
+                        category_id: categoryId,
+                        description: ''
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    const li = document.createElement('li');
+                    li.dataset.id = result.todo_id;
+                    li.innerHTML = `
+                        <input type="checkbox" class="checkbox" onclick="toggleComplete(this, ${result.todo_id})">
+                        <span>${input.value}</span>
+                        <span class="delete" onclick="deleteTask(this, ${result.todo_id})">Hapus</span>
+                    `;
+                    list.appendChild(li);
+                    input.value = '';
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error menambah task: ' + error.message);
+            }
+        }
+
+        async function toggleComplete(checkbox, todoId) {
+            const li = checkbox.parentElement;
+            const completed = checkbox.checked ? 1 : 0;
+            const token = localStorage.getItem('authToken');
+
+            try {
+                const response = await fetch(`${API_URL}?action=update_todo`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        id: todoId,
+                        completed: completed
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    li.classList.toggle('completed');
+                }
+            } catch (error) {
+                console.error('Error toggling task:', error);
+            }
+        }
+
+        async function deleteTask(deleteBtn, todoId) {
+            if (!confirm('Hapus task ini?')) return;
+
+            const token = localStorage.getItem('authToken');
+            const li = deleteBtn.parentElement;
+
+            try {
+                const response = await fetch(`${API_URL}?action=delete_todo`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        id: todoId
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    li.remove();
+                }
+            } catch (error) {
+                alert('Error menghapus task: ' + error.message);
+            }
+        }
+
+        // ============ UPDATE LOG SEGMENT OPTIONS ============
+        function updateLogSegmentOptions() {
+            const select = document.getElementById('log-segment');
+            const currentValue = select.value;
+            
+            // Keep the placeholder option
+            const options = [{ value: '', text: 'Pilih Segmen To-Do' }];
+            
+            categories.forEach(category => {
+                options.push({ value: category.name, text: category.name });
+            });
+
+            select.innerHTML = '';
+            options.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.text = opt.text;
+                select.appendChild(option);
+            });
+        }
+
+        // ============ ACTIVITY LOGGING ============
+        document.getElementById('log-form')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const date = document.getElementById('log-date').value;
+            const time = document.getElementById('log-time').value;
+            const segment = document.getElementById('log-segment').value;
+            const token = localStorage.getItem('authToken');
+
+            if (!segment) {
+                alert('Pilih segmen terlebih dahulu');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}?action=add_log`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        log_date: date,
+                        log_time: time,
+                        category: segment
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Log disimpan!');
+                    this.reset();
+                    loadDashboard();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error menyimpan log: ' + error.message);
+            }
+        });
+
+        // ============ UI FUNCTIONS ============
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        document.querySelectorAll('.sidebar li').forEach(item => {
+            item.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    document.getElementById('sidebar').classList.remove('open');
+                }
+            });
+        });
+
+        // ============ VIEW MANAGEMENT ============
+        function showView(view) {
+            const todoView = document.getElementById('todo-view');
+            const dashboardView = document.getElementById('dashboard-view');
+            const sidebarItems = document.querySelectorAll('.sidebar li');
+            sidebarItems.forEach(item => item.classList.remove('active'));
+            
+            if (view === 'todo') {
+                todoView.style.display = 'block';
+                dashboardView.style.display = 'none';
+                sidebarItems[0].classList.add('active');
+            } else {
+                todoView.style.display = 'none';
+                dashboardView.style.display = 'block';
+                sidebarItems[1].classList.add('active');
+                loadDashboard();
+            }
+        }
+
+        // ============ DASHBOARD ============
+        async function loadDashboard() {
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                const response = await fetch(`${API_URL}?action=get_logs`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                const logs = result.success ? result.logs : [];
+                
+                const tbody = document.querySelector('#log-table tbody');
+                tbody.innerHTML = '';
+                logs.forEach(log => {
+                    const row = `<tr><td>${log.log_date}</td><td>${log.log_time}</td><td>${log.category}</td></tr>`;
+                    tbody.innerHTML += row;
+                });
+
+                // Generate chart
+                const segmentCounts = {};
+                logs.forEach(log => {
+                    segmentCounts[log.category] = (segmentCounts[log.category] || 0) + 1;
+                });
+                const labels = Object.keys(segmentCounts);
+                const data = Object.values(segmentCounts);
+
+                const ctx = document.getElementById('chart').getContext('2d');
+                if (currentChart) {
+                    currentChart.destroy();
+                }
+                currentChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Jumlah To-Do',
+                            data: data,
+                            backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8', '#6f42c1', '#fd7e14', '#20c997'],
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        window.addEventListener('load', () => {
+            showView('todo');
+        });
+
+        // ============ MODAL CLOSE ON ESCAPE ============
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeCategoryModal();
+            }
+        });
+
+        // ============ MODAL CLOSE ON OUTSIDE CLICK ============
+        document.getElementById('category-modal')?.addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeCategoryModal();
+            }
+        });
+    </script>
+</body>
+</html>

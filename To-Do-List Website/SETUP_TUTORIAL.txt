@@ -1,0 +1,498 @@
+# 🎬 SETUP TUTORIAL: FITUR KATEGORI DINAMIS
+
+## 📺 Tutorial Step-by-Step
+
+Panduan ini akan memandu Anda melakukan setup database untuk fitur kategori dinamis.
+
+---
+
+## ⏱️ ESTIMATED TIME: 5-10 MINUTES
+
+---
+
+## 🎯 PREREQUISITE
+
+Anda sudah memiliki:
+- ✅ XAMPP/Apache running
+- ✅ MySQL running  
+- ✅ Database `todo_list` sudah ada
+- ✅ Tabel users, todos, sessions sudah ada
+- ✅ Login functionality working
+
+---
+
+## 📋 OPTION 1: FRESH INSTALL (RECOMMENDED)
+
+Jika Anda baru pertama kali setup:
+
+### Step 1: Backup Database Saat Ini (Optional)
+```
+1. Buka http://localhost/phpmyadmin
+2. Login dengan username root (password kosong)
+3. Pilih database "todo_list"
+4. Klik "Export"
+5. Klik "Go" untuk download backup
+```
+
+### Step 2: Import File Setup Baru
+```
+1. Buka http://localhost/phpmyadmin
+2. Click tab "Import"
+3. Click "Choose File"
+4. Pilih file: db_setup_updated.sql
+5. Scroll ke bawah, klik "Go"
+6. Tunggu sampai selesai (message: "Import successful")
+```
+
+### Step 3: Verifikasi
+```
+1. Di phpmyadmin, pilih database "todo_list"
+2. Lihat di sidebar table list:
+   ✅ categories (table baru)
+   ✅ todos (sudah ada, tapi ada column baru)
+   ✅ users
+   ✅ sessions
+   ✅ activity_logs
+3. Jika semua ada, setup selesai! ✅
+```
+
+---
+
+## 📋 OPTION 2: MIGRATION (EXISTING DATABASE)
+
+Jika Anda sudah memiliki data yang ingin disimpan:
+
+### Step 1: Backup Database
+```
+Sangat PENTING! Backup dulu sebelum modifikasi.
+
+Di phpmyadmin:
+1. Select database "todo_list"
+2. Click "Export"
+3. Click "Go"
+4. Download file backup.sql
+5. Simpan di tempat aman
+```
+
+### Step 2: Buat Table Categories
+```
+1. Buka phpmyadmin
+2. Select database "todo_list"
+3. Click tab "SQL"
+4. Copy-paste code berikut:
+
+CREATE TABLE IF NOT EXISTS categories (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    emoji VARCHAR(10) DEFAULT '📝',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_category_per_user (user_id, name)
+);
+
+5. Click "Go"
+6. Tunggu sampai selesai
+```
+
+### Step 3: Modify Table Todos
+```
+1. Di phpmyadmin, masih di tab "SQL"
+2. Copy-paste code berikut:
+
+ALTER TABLE todos ADD COLUMN category_id INT AFTER user_id;
+ALTER TABLE todos ADD FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE;
+
+3. Click "Go"
+4. Tunggu sampai selesai
+```
+
+### Step 4: Add Indexes
+```
+1. Di phpmyadmin, masih di tab "SQL"
+2. Copy-paste code berikut:
+
+CREATE INDEX idx_user_categories ON categories(user_id);
+CREATE INDEX idx_category_todos ON todos(category_id);
+
+3. Click "Go"
+4. Selesai!
+```
+
+### Step 5: Verifikasi
+```
+1. Di phpmyadmin, select database "todo_list"
+2. Klik table "categories"
+3. Pastikan sudah ada (akan terlihat kosong, tapi itu normal)
+4. Klik table "todos"
+5. Lihat struktur: harus ada column "category_id"
+```
+
+---
+
+## 🧪 VERIFICATION CHECKLIST
+
+Setelah setup selesai, pastikan:
+
+### Database Tables
+```
+☑ categories table exists
+   - id (INT, PK, AI)
+   - user_id (INT, FK)
+   - name (VARCHAR 255)
+   - emoji (VARCHAR 10)
+   - created_at (TIMESTAMP)
+   - updated_at (TIMESTAMP)
+
+☑ todos table has category_id column
+   - Tipe: INT
+   - FK ke categories.id
+   - ON DELETE CASCADE
+
+☑ Indexes ada:
+   - idx_user_categories
+   - idx_category_todos
+```
+
+### Files Updated
+```
+☑ index.html - Modal & JS untuk kategori
+☑ api.php - New endpoints untuk kategori
+```
+
+### Test Application
+```
+1. ☑ Buka index.html
+2. ☑ Login dengan akun Anda
+3. ☑ Lihat tombol "+ Tambah Kategori"
+4. ☑ Click tombol, modal muncul
+5. ☑ Isi nama kategori: "Test"
+6. ☑ Click "Simpan"
+7. ☑ Kategori muncul di halaman
+8. ☑ Add task ke kategori
+9. ☑ Edit kategori
+10. ☑ Delete kategori
+```
+
+---
+
+## 🐛 COMMON ISSUES & SOLUTIONS
+
+### Error: "Unknown column 'category_id' in 'on duplicate key update'"
+**Cause:** Column belum ditambahkan ke table todos  
+**Solution:**
+```
+1. Go to phpmyadmin
+2. Select database todo_list
+3. Click table todos → Structure
+4. Cari column "category_id"
+5. Jika tidak ada, jalankan:
+   ALTER TABLE todos ADD COLUMN category_id INT AFTER user_id;
+```
+
+### Error: "Cannot add or update a child row"
+**Cause:** Foreign key constraint violation  
+**Solution:**
+```
+1. Pastikan table categories sudah exist
+2. Pastikan FK sudah dibuat dengan benar
+3. Jika ada data lama, cleanup:
+   DELETE FROM todos WHERE category_id IS NULL AND id NOT IN (SELECT id FROM todos WHERE category_id > 0);
+```
+
+### Kategori tidak muncul setelah dibuat
+**Cause:** Database tidak ter-update atau cache  
+**Solution:**
+```
+1. Hard refresh browser: Ctrl + Shift + R
+2. Clear cache: Ctrl + Shift + Delete
+3. Check phpmyadmin jika data ada di table
+4. Check browser console (F12) untuk error
+```
+
+### Modal tidak bisa dibuka
+**Cause:** JavaScript error  
+**Solution:**
+```
+1. Open browser console: F12
+2. Lihat error message
+3. Pastikan file index.html sudah ter-update
+4. Check apakah ada syntax error
+```
+
+---
+
+## 📊 DATABASE SCHEMA VISUALIZATION
+
+```
+┌─────────────────────────────────────────┐
+│ USERS                                   │
+├─────────────────────────────────────────┤
+│ id (PK)                                 │
+│ username                                │
+│ password                                │
+│ created_at                              │
+└─────────────────────────────────────────┘
+        │
+        └──── (1 to Many)
+             │
+             ▼
+┌─────────────────────────────────────────┐
+│ CATEGORIES (NEW TABLE)                  │
+├─────────────────────────────────────────┤
+│ id (PK)                                 │
+│ user_id (FK) → users.id                │
+│ name                                    │
+│ emoji                                   │
+│ created_at                              │
+│ updated_at                              │
+└─────────────────────────────────────────┘
+        │
+        └──── (1 to Many)
+             │
+             ▼
+┌─────────────────────────────────────────┐
+│ TODOS (MODIFIED)                        │
+├─────────────────────────────────────────┤
+│ id (PK)                                 │
+│ user_id (FK) → users.id                │
+│ category_id (FK) → categories.id (NEW) │
+│ title                                   │
+│ description                             │
+│ completed                               │
+│ priority                                │
+│ due_date                                │
+│ created_at                              │
+│ updated_at                              │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## 🎬 STEP-BY-STEP VIDEO GUIDE (Text Version)
+
+### Scenario: Fresh Installation
+
+**Timeline: 0:00 - Start Setup**
+```
+Action:
+1. Open browser
+2. Go to http://localhost/phpmyadmin
+3. Login (username: root, password: empty)
+Expected:
+- PhpMyAdmin dashboard appears
+- "todo_list" database visible in left sidebar
+```
+
+**Timeline: 0:30 - Import Database**
+```
+Action:
+1. Select "todo_list" database
+2. Click "Import" tab
+3. Click "Choose File"
+4. Select db_setup_updated.sql
+5. Click "Go"
+Expected:
+- Page shows "Import successful"
+- "categories" table now appears in table list
+```
+
+**Timeline: 2:00 - Verify Structure**
+```
+Action:
+1. Click on "categories" table
+2. Click "Structure" tab
+Expected:
+- See columns: id, user_id, name, emoji, created_at, updated_at
+- user_id has FK constraint to users.id
+```
+
+**Timeline: 2:30 - Verify Todos**
+```
+Action:
+1. Click on "todos" table
+2. Click "Structure" tab
+Expected:
+- See "category_id" column (INT type)
+- category_id has FK constraint to categories.id
+- FK has "ON DELETE CASCADE"
+```
+
+**Timeline: 3:00 - Test Application**
+```
+Action:
+1. Open index.html in browser
+2. Login with your credentials
+Expected:
+- Dashboard appears
+- "+ Tambah Kategori" button visible
+```
+
+**Timeline: 3:30 - Create Category**
+```
+Action:
+1. Click "+ Tambah Kategori" button
+2. Type: "Test Category"
+3. Keep emoji as 📝
+4. Click "Simpan"
+Expected:
+- Modal closes
+- New category appears on page
+- Colored section with "Test Category" visible
+```
+
+**Timeline: 4:00 - Add Task**
+```
+Action:
+1. In new category, type in task field: "Test Task"
+2. Click "Tambah" button
+Expected:
+- Task appears in category
+- Checkbox visible
+- Delete button visible
+```
+
+**Timeline: 4:30 - Edit Category**
+```
+Action:
+1. Click "✏️ Edit" button
+2. Change name to "Learning"
+3. Change emoji to 📚
+4. Click "Simpan"
+Expected:
+- Modal closes
+- Category name updated
+- Emoji updated
+- Task still there
+```
+
+**Timeline: 5:00 - Complete Setup**
+```
+Congratulations! Setup selesai! 🎉
+Sekarang Anda bisa:
+- Create unlimited categories
+- Manage tasks per category
+- Edit and delete categories
+```
+
+---
+
+## ✅ FINAL CHECKLIST
+
+Sebelum declare setup selesai:
+
+```
+Database Setup:
+  ☑ categories table created
+  ☑ todos.category_id column added
+  ☑ Foreign keys configured
+  ☑ Indexes created
+  
+Files:
+  ☑ index.html updated (modal & JS)
+  ☑ api.php updated (new endpoints)
+  ☑ Verifikasi file sizes masuk akal
+  
+Functionality:
+  ☑ Can create category
+  ☑ Can add task to category
+  ☑ Can edit category
+  ☑ Can delete category
+  ☑ Can delete task
+  ☑ Dashboard updates
+  
+Performance:
+  ☑ No console errors
+  ☑ API calls return 200 OK
+  ☑ Data persists in database
+  ☑ No performance issues
+```
+
+---
+
+## 🎓 NEXT LEARNING STEPS
+
+Setelah setup selesai:
+
+1. **Baca dokumentasi:**
+   - CATEGORIES_GUIDE.md (Lengkap)
+   - PANDUAN_KATEGORI.txt (User guide)
+
+2. **Explore code:**
+   - Lihat function di index.html
+   - Lihat API endpoints di api.php
+   - Understand database schema
+
+3. **Try features:**
+   - Create multiple categories
+   - Use dashboard
+   - Test on mobile
+
+4. **Customize:**
+   - Add more features
+   - Modify styling
+   - Extend functionality
+
+---
+
+## 📞 SUPPORT RESOURCES
+
+Jika error atau masalah:
+
+1. **Check documentation files:**
+   - IMPLEMENTATION_COMPLETE.txt (Technical details)
+   - MIGRATION_GUIDE.txt (Database help)
+   - QUICK_START_CATEGORIES.txt (Quick reference)
+
+2. **Debug steps:**
+   - F12 → Console (check errors)
+   - F12 → Network (check API calls)
+   - PhpMyAdmin → SQL (verify data)
+
+3. **Common issues:**
+   - Check file dates (latest should be Feb 27, 2026)
+   - Verify all files are in correct location
+   - Check file permissions
+
+---
+
+## 🏆 SUCCESS CRITERIA
+
+Setup berhasil jika:
+
+```
+✅ Dapat membuat kategori
+✅ Dapat menambah task
+✅ Dapat mengedit kategori
+✅ Dapat menghapus kategori
+✅ Data tersimpan di database
+✅ Tidak ada error di console
+✅ Responsive di mobile
+✅ Dashboard bekerja
+```
+
+---
+
+## 🎉 CONGRATULATIONS!
+
+Anda sudah berhasil setup fitur kategori dinamis!
+
+**Selarang Anda bisa:**
+- 🎯 Membuat unlimited kategori
+- 📝 Manage tasks yang lebih terorganisir
+- 📊 Track progress di dashboard
+- 🎨 Customize dengan emoji
+- ⚡ Bekerja lebih produktif!
+
+---
+
+**Total Setup Time:** 5-10 minutes  
+**Difficulty:** Easy  
+**Required Skills:** PhpMyAdmin basics, browser navigation
+
+Version: 2.0 (Dynamic Categories Setup)  
+Last Updated: February 27, 2026  
+Status: ✅ Production Ready
+
+Selamat menggunakan! 🚀✨

@@ -1,0 +1,2221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List Sederhana</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --white: #ffffff;
+        }
+
+        body {          
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #1e293b;
+        }
+
+        /* ===== SIDEBAR STYLING ===== */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            padding: 30px 20px;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+            transition: width 0.3s ease, transform 0.3s ease;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #6366f1, #ec4899, #f59e0b);
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background: linear-gradient(90deg, #6366f1, #ec4899, #f59e0b); }
+            50% { background: linear-gradient(90deg, #f59e0b, #6366f1, #ec4899); }
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar h2 {
+            margin: 0 0 30px 0;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        .sidebar.collapsed h2 {
+            display: none;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 30px 0;
+        }
+
+        .sidebar li {
+            padding: 14px 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 4px;
+            height: 0;
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            transform: translateY(-50%);
+            transition: height 0.3s ease;
+        }
+
+        .sidebar li:hover {
+            background: rgba(99, 102, 241, 0.15);
+            transform: translateX(8px);
+        }
+
+        .sidebar li:hover::before {
+            height: 24px;
+        }
+
+        .sidebar li.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.2));
+            color: #6366f1;
+            font-weight: 600;
+        }
+
+        .sidebar li.active::before {
+            height: 24px;
+        }
+
+        .sidebar .icon {
+            display: inline-block;
+            width: 24px;
+            font-size: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed .text {
+            display: none;
+        }
+
+        .user-section {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto;
+            background: rgba(99, 102, 241, 0.05);
+            border-radius: 12px;
+        }
+
+        .user-info {
+            color: #cbd5e1;
+            font-size: 13px;
+            margin-bottom: 12px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .logout-btn:active {
+            transform: translateY(0);
+        }
+
+        /* ===== TOGGLE BUTTON ===== */
+        .toggle-btn {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(135deg, #6366f1, #ec4899);
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            cursor: pointer;
+            z-index: 1001;
+            border-radius: 12px;
+            font-size: 20px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+
+        .toggle-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            width: 100%;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.95) 100%);
+            position: relative;
+        }
+
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .main-content > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== GREETING ===== */
+        .greeting {
+            font-size: 32px;
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInSlide 0.8s ease-out;
+            font-weight: 700;
+            text-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+            letter-spacing: -0.5px;
+        }
+
+        @keyframes fadeInSlide {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ===== SEGMENT (CATEGORY) ===== */
+        .segment {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            padding: 28px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .segment::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #6366f1, #ec4899);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .segment:hover {
+            box-shadow: 0 12px 48px rgba(99, 102, 241, 0.2);
+            transform: translateY(-4px);
+        }
+
+        .segment:hover::before {
+            opacity: 1;
+        }
+
+        h2 {
+            margin: 0 0 20px 0;
+            color: #1e293b;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 12px;
+            transition: all 0.3s ease;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        h2:hover {
+            color: #6366f1;
+        }
+
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 0;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 150px;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px 0 0 12px;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            font-family: 'Poppins', sans-serif;
+            background: white;
+        }
+
+        input[type="text"]:focus {
+            border-color: #6366f1;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        button {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            border-radius: 0 12px 12px 0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            animation: fadeIn 0.5s ease;
+            word-break: break-word;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            transition: all 0.2s ease;
+            gap: 12px;
+        }
+
+        li:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateX(-10px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+
+        li.completed {
+            text-decoration: line-through;
+            color: #94a3b8;
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .checkbox {
+            margin-right: 0;
+            transform: scale(1.2);
+            transition: transform 0.2s ease;
+            cursor: pointer;
+            flex-shrink: 0;
+            accent-color: #6366f1;
+        }
+
+        .checkbox:hover {
+            transform: scale(1.35);
+        }
+
+        .delete {
+            margin-left: auto;
+            color: #ef4444;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+
+        .delete:hover {
+            color: #dc2626;
+            background: rgba(239, 68, 68, 0.1);
+            transform: scale(1.05);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            margin-top: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        footer h3 {
+            margin: 0 0 20px 0;
+            color: #1e293b;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        footer form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        footer input, footer select {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        footer input:focus, footer select:focus {
+            border-color: #6366f1;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        footer button {
+            padding: 12px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        footer button:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .dashboard-footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            border-top: 1px solid #e2e8f0;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .dashboard-footer a {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-footer a:hover {
+            color: #ec4899;
+            text-decoration: underline;
+        }
+
+        .dashboard-view {
+            display: none;
+        }
+
+        .dashboard-view h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .dashboard-view h2 {
+            font-size: 20px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .dashboard-view table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .dashboard-view th, .dashboard-view td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+
+        .dashboard-view th {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            font-weight: 600;
+        }
+
+        .dashboard-view canvas {
+            max-width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            padding: 20px;
+        }
+
+        .chart-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ===== MODAL STYLES ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            animation: fadeIn 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 500px;
+            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #1e293b;
+            font-size: 20px;
+            border: none;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: all 0.3s ease;
+            padding: 0;
+            width: auto;
+        }
+
+        .close-btn:hover {
+            color: #6366f1;
+            transform: rotate(90deg);
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .modal-input:focus {
+            border-color: #6366f1;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .save-btn:hover {
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
+            transform: translateY(-2px);
+        }
+
+        .cancel-btn {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .cancel-btn:hover {
+            background: #cbd5e1;
+        }
+
+        /* ===== CATEGORY HEADER ===== */
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 20px 28px;
+            background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+            border-radius: 18px;
+            color: white;
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
+        }
+
+        .category-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .add-category-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .add-category-btn:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .segment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .segment-header h2 {
+            margin: 0;
+            flex: 1;
+        }
+
+        .category-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .edit-category-btn, .delete-category-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .edit-category-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .edit-category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        }
+
+        .delete-category-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+
+        .delete-category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .empty-state-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        /* ===== LEARNING PROGRESS STYLES ===== */
+        .learning-form-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .learning-form-container h2 {
+            color: #1e293b;
+            margin-top: 0;
+        }
+
+        #learning-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        #learning-language, #learning-category, #learning-percentage {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            background: white;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        #learning-language:focus, #learning-category:focus, #learning-percentage:focus {
+            border-color: #6366f1;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        #learning-notes {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            background: white;
+            resize: vertical;
+        }
+
+        #learning-notes:focus {
+            border-color: #6366f1;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        #learning-form button {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        #learning-form button:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .learning-progress-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .learning-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .learning-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 48px rgba(99, 102, 241, 0.2);
+        }
+
+        .learning-card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 16px;
+        }
+
+        .learning-chart-wrapper {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin-bottom: 16px;
+        }
+
+        .learning-chart-wrapper canvas {
+            max-width: 100%;
+            height: 100%;
+        }
+
+        .learning-percentage-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: #6366f1;
+            margin-bottom: 8px;
+        }
+
+        .learning-category-text {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+        }
+
+        .learning-card-actions {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .learning-card-actions button {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .learning-edit-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .learning-edit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        }
+
+        .learning-delete-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+
+        .learning-delete-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .learning-topics-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .learning-language-section {
+            margin-bottom: 28px;
+        }
+
+        .learning-language-section h3 {
+            color: #1e293b;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .learning-topics-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .learning-topic-badge {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            animation: fadeIn 0.3s ease;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        .learning-empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+        }
+
+        .learning-empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .learning-empty-state-text {
+            font-size: 16px;
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        /* ===== RESPONSIVE LEARNING ===== */
+        @media (max-width: 1024px) {
+            .learning-progress-container {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            #learning-language, #learning-category, #learning-percentage {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .learning-form-container {
+                padding: 20px;
+            }
+
+            .learning-progress-container {
+                grid-template-columns: 1fr;
+            }
+
+            .learning-card {
+                padding: 20px;
+            }
+
+            .learning-topics-container {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .greeting {
+                font-size: 26px;
+            }
+
+            .segment {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: fixed;
+                top: 60px;
+                left: 0;
+                right: 0;
+                max-height: 0;
+                overflow: hidden;
+                padding: 0;
+                z-index: 999;
+                transition: max-height 0.3s ease;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            }
+
+            .sidebar.open {
+                max-height: 500px;
+                padding: 20px;
+            }
+
+            .sidebar.collapsed {
+                width: 100%;
+                max-height: 0;
+            }
+
+            .sidebar.collapsed.open {
+                max-height: 500px;
+                padding: 20px;
+            }
+
+            .sidebar h2 {
+                display: block;
+                margin-bottom: 15px;
+            }
+
+            .sidebar.collapsed h2 {
+                display: block;
+            }
+
+            .sidebar.collapsed .text {
+                display: inline;
+            }
+
+            .sidebar li {
+                padding: 12px;
+                font-size: 15px;
+            }
+
+            .toggle-btn {
+                display: block;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+            }
+
+            .main-content {
+                width: 100%;
+                padding: 80px 15px 20px 15px;
+                margin-left: 0;
+                padding-top: 70px;
+            }
+
+            .greeting {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+
+            .container {
+                gap: 15px;
+            }
+
+            .segment {
+                padding: 15px;
+                border-radius: 14px;
+            }
+
+            .segment:hover {
+                transform: none;
+            }
+
+            h2 {
+                font-size: 16px;
+                margin-bottom: 15px;
+            }
+
+            .input-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            input[type="text"] {
+                width: 100%;
+                border-radius: 10px;
+                min-width: auto;
+            }
+
+            button {
+                width: 100%;
+                border-radius: 10px;
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            button:hover {
+                transform: none;
+            }
+
+            li {
+                padding: 10px;
+                font-size: 13px;
+                flex-wrap: wrap;
+            }
+
+            .delete {
+                margin-left: auto;
+                padding: 6px 10px;
+            }
+
+            footer {
+                padding: 15px;
+                margin-top: 15px;
+            }
+
+            footer h3 {
+                font-size: 16px;
+            }
+
+            footer input, footer select {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            footer button {
+                padding: 12px;
+                width: 100%;
+            }
+
+            .category-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .category-header h1 {
+                font-size: 20px;
+            }
+
+            .add-category-btn {
+                width: 100%;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .segment-header {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .category-actions {
+                width: 100%;
+            }
+
+            .edit-category-btn, .delete-category-btn {
+                flex: 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                font-size: 13px;
+            }
+
+            .toggle-btn {
+                padding: 10px 12px;
+                font-size: 18px;
+            }
+
+            .main-content {
+                padding: 70px 12px 15px 12px;
+                padding-top: 65px;
+            }
+
+            .greeting {
+                font-size: 18px;
+            }
+
+            .segment {
+                padding: 12px;
+            }
+
+            h2 {
+                font-size: 14px;
+            }
+
+            input[type="text"] {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            button {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            li {
+                padding: 8px;
+                font-size: 12px;
+            }
+
+            .delete {
+                font-size: 11px;
+            }
+
+            footer input, footer select {
+                padding: 10px;
+                font-size: 12px;
+            }
+
+            .dashboard-view th, .dashboard-view td {
+                padding: 6px;
+                font-size: 11px;
+            }
+
+            .empty-state-icon {
+                font-size: 48px;
+            }
+
+            .empty-state-text {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+    <div class="sidebar" id="sidebar">
+        <h2>Navigasi</h2>
+        <ul>
+            <li class="active" onclick="showView('todo')">
+                <span class="icon">📝</span><span class="text">To-Do List</span>
+            </li>
+            <li onclick="showView('dashboard')">
+                <span class="icon">📊</span><span class="text">Dashboard</span>
+            </li>
+            <li onclick="showView('learning')">
+                <span class="icon">📚</span><span class="text">Learning Progress</span>
+            </li>
+        </ul>
+        <div class="user-section">
+            <div class="user-info">
+                👤 <span id="username-display">User</span>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+    </div>
+    <div class="main-content" id="main-content">
+        <div id="todo-view">
+            <div class="greeting" id="greeting"></div>
+            <div class="container">
+                <!-- Category Management Header -->
+                <div class="category-header">
+                    <h1>📚 Kategori To-Do List Saya</h1>
+                    <button class="add-category-btn" onclick="openAddCategoryModal()">+ Tambah Kategori</button>
+                </div>
+
+                <!-- Dynamic Categories Container -->
+                <div id="categories-container"></div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="segment" style="display: none;">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div class="empty-state-text">Belum ada kategori. Mulai dengan menambah kategori baru!</div>
+                        <button class="add-category-btn" onclick="openAddCategoryModal()">Buat Kategori Pertama</button>
+                    </div>
+                </div>
+            </div>
+            <footer>
+                <h3>Log Aktivitas To-Do</h3>
+                <form id="log-form">
+                    <input type="date" id="log-date" required>
+                    <input type="time" id="log-time" required>
+                    <select id="log-segment" required>
+                        <option value="">Pilih Segmen To-Do</option>
+                    </select>
+                    <button type="submit">Simpan Log</button>
+                </form>
+            </footer>
+        </div>
+        <div id="dashboard-view" class="dashboard-view">
+            <h1>Dashboard Monitoring To-Do List</h1>
+            <h2>Data Log Aktivitas</h2>
+            <table id="log-table">
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Jam</th>
+                        <th>Segmen</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <h2>Grafik Jumlah To-Do per Segmen</h2>
+            <div class="chart-container">
+                <canvas id="chart"></canvas>
+            </div>
+
+            <div class="dashboard-footer">
+                Made with 💙 by <a href="#"><strong>Ahnaf Fathir Raihan</strong></a>
+            </div>
+        </div>
+
+        <div id="learning-view" class="dashboard-view">
+            <h1>📚 Learning Progress - Tracking Pembelajaran Saya</h1>
+            
+            <div class="learning-form-container">
+                <h2>Masukkan Catatan Pembelajaran</h2>
+                <form id="learning-form">
+                    <div class="form-row">
+                        <select id="learning-language" required>
+                            <option value="">Pilih Bahasa/Framework</option>
+                            <option value="PHP">🐘 PHP</option>
+                            <option value="JavaScript">⚙️ JavaScript</option>
+                            <option value="HTML">📄 HTML</option>
+                            <option value="CSS">🎨 CSS</option>
+                            <option value="Laravel">🚀 Laravel</option>
+                        </select>
+                        <input type="text" id="learning-category" placeholder="Kategori (e.g., Language, Framework)" required>
+                    </div>
+                    <textarea id="learning-notes" placeholder="Deskripsi pembelajaran (AI akan mendeteksi topik yang dipelajari)..." rows="4"></textarea>
+                    <div class="form-row">
+                        <input type="number" id="learning-percentage" min="0" max="100" placeholder="Persentase (0-100%)" required>
+                        <button type="submit">Simpan Progress</button>
+                    </div>
+                </form>
+            </div>
+
+            <h2>Progress Ring Charts</h2>
+            <div id="learning-progress-container" class="learning-progress-container">
+                <!-- Ring charts akan dirender di sini -->
+            </div>
+
+            <h2>Topik Yang Sudah Dipelajari</h2>
+            <div id="learning-topics-container" class="learning-topics-container">
+                <!-- Topics list akan dirender di sini -->
+            </div>
+
+            <div class="dashboard-footer">
+                Made with 💙 by <a href="#"><strong>Ahnaf Fathir Raihan</strong></a>
+            </div>
+        </div>
+
+        <div class="dashboard-footer">
+            Made with 💙 by <a href="#"><strong>Ahnaf Fathir Raihan</strong></a>
+        </div>
+    </div>
+
+    <!-- Modal: Add/Edit Category -->
+    <div id="category-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Tambah Kategori Baru</h2>
+                <button class="close-btn" onclick="closeCategoryModal()">&times;</button>
+            </div>
+            <input 
+                type="text" 
+                id="category-name-input" 
+                class="modal-input" 
+                placeholder="Masukkan nama kategori..."
+                maxlength="50"
+            >
+            <input 
+                type="text" 
+                id="category-emoji-input" 
+                class="modal-input" 
+                placeholder="Emoji atau icon (opsional)"
+                maxlength="3"
+                value="📝"
+            >
+            <div class="modal-buttons">
+                <button class="cancel-btn" onclick="closeCategoryModal()">Batal</button>
+                <button class="save-btn" id="save-category-btn" onclick="saveCategory()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost/To-Do-List Website/api.php';
+        let currentChart = null;
+        let categories = [];
+        let editingCategoryId = null;
+
+        // ============ AUTENTIKASI ============
+        async function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const userId = localStorage.getItem('userId');
+            const username = localStorage.getItem('username');
+            
+            if (!token || !userId || !username) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            document.getElementById('username-display').textContent = username;
+            setGreeting();
+            loadCategories();
+        }
+
+        function logout() {
+            if (confirm('Apakah Anda yakin ingin logout?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('username');
+                window.location.href = 'login.html';
+            }
+        }
+
+        window.addEventListener('load', checkAuth);
+
+        // ============ GREETING ============
+        function setGreeting() {
+            const now = new Date();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            const time = hour + minute / 60;
+            let timeOfDay;
+            if (time >= 0 && time <= 10) {
+                timeOfDay = 'pagi';
+            } else if (time > 10 && time <= 15) {
+                timeOfDay = 'siang';
+            } else if (time > 15 && time <= 16) {
+                timeOfDay = 'sore';
+            } else {
+                timeOfDay = 'malam';
+            }
+            const username = localStorage.getItem('username') || 'User';
+            document.getElementById('greeting').textContent = `Selamat ${timeOfDay} ${username}`;
+        }
+
+        // ============ CATEGORY MANAGEMENT ============
+        async function loadCategories() {
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                const response = await fetch(`${API_URL}?action=get_categories`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    categories = result.categories || [];
+                    renderCategories();
+                    updateLogSegmentOptions();
+                } else {
+                    categories = [];
+                    renderEmptyState();
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                renderEmptyState();
+            }
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categories-container');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (!categories || categories.length === 0) {
+                container.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            container.innerHTML = '';
+
+            categories.forEach(category => {
+                const segment = document.createElement('div');
+                segment.className = 'segment';
+                segment.dataset.categoryId = category.id;
+                
+                const categoryId = category.id;
+                const emoji = category.emoji || '📝';
+                const name = category.name;
+
+                segment.innerHTML = `
+                    <div class="segment-header">
+                        <h2>${emoji} ${name}</h2>
+                        <div class="category-actions">
+                            <button class="edit-category-btn" onclick="openEditCategoryModal(${categoryId}, '${name.replace(/'/g, "\\'")}', '${emoji}')">✏️ Edit</button>
+                            <button class="delete-category-btn" onclick="deleteCategory(${categoryId})">🗑️ Hapus</button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="task-input" data-category-id="${categoryId}" placeholder="Tambah tugas...">
+                        <button onclick="addTask(${categoryId})">Tambah</button>
+                    </div>
+                    <ul class="task-list" data-category-id="${categoryId}"></ul>
+                `;
+
+                container.appendChild(segment);
+                loadTasksForCategory(categoryId);
+            });
+        }
+
+        function renderEmptyState() {
+            const container = document.getElementById('categories-container');
+            const emptyState = document.getElementById('empty-state');
+            container.innerHTML = '';
+            emptyState.style.display = 'block';
+        }
+
+        // ============ MODAL FUNCTIONS ============
+        function openAddCategoryModal() {
+            editingCategoryId = null;
+            document.getElementById('modal-title').textContent = 'Tambah Kategori Baru';
+            document.getElementById('category-name-input').value = '';
+            document.getElementById('category-emoji-input').value = '📝';
+            document.getElementById('save-category-btn').onclick = saveCategory;
+            document.getElementById('category-modal').classList.add('show');
+            document.getElementById('category-name-input').focus();
+        }
+
+        function openEditCategoryModal(id, name, emoji) {
+            editingCategoryId = id;
+            document.getElementById('modal-title').textContent = 'Edit Kategori';
+            document.getElementById('category-name-input').value = name;
+            document.getElementById('category-emoji-input').value = emoji;
+            document.getElementById('category-modal').classList.add('show');
+            document.getElementById('category-name-input').focus();
+        }
+
+        function closeCategoryModal() {
+            document.getElementById('category-modal').classList.remove('show');
+            editingCategoryId = null;
+        }
+
+        async function saveCategory() {
+            const name = document.getElementById('category-name-input').value.trim();
+            const emoji = document.getElementById('category-emoji-input').value.trim() || '📝';
+            const token = localStorage.getItem('authToken');
+
+            if (!name) {
+                alert('Nama kategori tidak boleh kosong');
+                return;
+            }
+
+            try {
+                const action = editingCategoryId ? 'update_category' : 'add_category';
+                const body = editingCategoryId 
+                    ? { id: editingCategoryId, name, emoji }
+                    : { name, emoji };
+
+                const response = await fetch(`${API_URL}?action=${action}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    closeCategoryModal();
+                    loadCategories();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error menyimpan kategori: ' + error.message);
+            }
+        }
+
+        async function deleteCategory(categoryId) {
+            if (!confirm('Apakah Anda yakin ingin menghapus kategori ini? Semua task di kategori ini akan dihapus.')) {
+                return;
+            }
+
+            const token = localStorage.getItem('authToken');
+
+            try {
+                const response = await fetch(`${API_URL}?action=delete_category`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ id: categoryId })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    loadCategories();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error menghapus kategori: ' + error.message);
+            }
+        }
+
+        // ============ TODO MANAGEMENT ============
+        async function loadTasksForCategory(categoryId) {
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                const response = await fetch(`${API_URL}?action=get_todos&category_id=${categoryId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    const list = document.querySelector(`.task-list[data-category-id="${categoryId}"]`);
+                    list.innerHTML = '';
+                    
+                    result.todos.forEach(todo => {
+                        const li = document.createElement('li');
+                        if (todo.completed) li.classList.add('completed');
+                        li.dataset.id = todo.id;
+                        li.innerHTML = `
+                            <input type="checkbox" class="checkbox" ${todo.completed ? 'checked' : ''} onclick="toggleComplete(this, ${todo.id})">
+                            <span>${todo.title}</span>
+                            <span class="delete" onclick="deleteTask(this, ${todo.id})">Hapus</span>
+                        `;
+                        list.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+            }
+        }
+
+        async function addTask(categoryId) {
+            const input = document.querySelector(`.task-input[data-category-id="${categoryId}"]`);
+            const list = document.querySelector(`.task-list[data-category-id="${categoryId}"]`);
+            
+            if (input.value.trim() === '') return;
+
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                const response = await fetch(`${API_URL}?action=add_todo`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        title: input.value,
+                        category_id: categoryId,
+                        description: ''
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    const li = document.createElement('li');
+                    li.dataset.id = result.todo_id;
+                    li.innerHTML = `
+                        <input type="checkbox" class="checkbox" onclick="toggleComplete(this, ${result.todo_id})">
+                        <span>${input.value}</span>
+                        <span class="delete" onclick="deleteTask(this, ${result.todo_id})">Hapus</span>
+                    `;
+                    list.appendChild(li);
+                    input.value = '';
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error menambah task: ' + error.message);
+            }
+        }
+
+        async function toggleComplete(checkbox, todoId) {
+            const li = checkbox.parentElement;
+            const completed = checkbox.checked ? 1 : 0;
+            const token = localStorage.getItem('authToken');
+
+            try {
+                const response = await fetch(`${API_URL}?action=update_todo`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        id: todoId,
+                        completed: completed
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    li.classList.toggle('completed');
+                }
+            } catch (error) {
+                console.error('Error toggling task:', error);
+            }
+        }
+
+        async function deleteTask(deleteBtn, todoId) {
+            if (!confirm('Hapus task ini?')) return;
+
+            const token = localStorage.getItem('authToken');
+            const li = deleteBtn.parentElement;
+
+            try {
+                const response = await fetch(`${API_URL}?action=delete_todo`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        id: todoId
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    li.remove();
+                }
+            } catch (error) {
+                alert('Error menghapus task: ' + error.message);
+            }
+        }
+
+        // ============ UPDATE LOG SEGMENT OPTIONS ============
+        function updateLogSegmentOptions() {
+            const select = document.getElementById('log-segment');
+            const currentValue = select.value;
+            
+            const options = [{ value: '', text: 'Pilih Segmen To-Do' }];
+            
+            categories.forEach(category => {
+                options.push({ value: category.name, text: category.name });
+            });
+
+            select.innerHTML = '';
+            options.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.text = opt.text;
+                select.appendChild(option);
+            });
+        }
+
+        // ============ ACTIVITY LOGGING ============
+        document.getElementById('log-form')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const date = document.getElementById('log-date').value;
+            const time = document.getElementById('log-time').value;
+            const segment = document.getElementById('log-segment').value;
+            const token = localStorage.getItem('authToken');
+
+            if (!segment) {
+                alert('Pilih segmen terlebih dahulu');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}?action=add_log`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        log_date: date,
+                        log_time: time,
+                        category: segment
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Log disimpan!');
+                    this.reset();
+                    loadDashboard();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error menyimpan log: ' + error.message);
+            }
+        });
+
+        // ============ UI FUNCTIONS ============
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        document.querySelectorAll('.sidebar li').forEach(item => {
+            item.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    document.getElementById('sidebar').classList.remove('open');
+                }
+            });
+        });
+
+        // ============ VIEW MANAGEMENT ============
+        function showView(view) {
+            const todoView = document.getElementById('todo-view');
+            const dashboardView = document.getElementById('dashboard-view');
+            const learningView = document.getElementById('learning-view');
+            const sidebarItems = document.querySelectorAll('.sidebar li');
+            sidebarItems.forEach(item => item.classList.remove('active'));
+            
+            if (view === 'todo') {
+                todoView.style.display = 'block';
+                dashboardView.style.display = 'none';
+                learningView.style.display = 'none';
+                sidebarItems[0].classList.add('active');
+            } else if (view === 'dashboard') {
+                todoView.style.display = 'none';
+                dashboardView.style.display = 'block';
+                learningView.style.display = 'none';
+                sidebarItems[1].classList.add('active');
+                loadDashboard();
+            } else if (view === 'learning') {
+                todoView.style.display = 'none';
+                dashboardView.style.display = 'none';
+                learningView.style.display = 'block';
+                sidebarItems[2].classList.add('active');
+                loadLearningProgress();
+            }
+        }
+
+        // ============ DASHBOARD ============
+        async function loadDashboard() {
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                const response = await fetch(`${API_URL}?action=get_logs`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                const logs = result.success ? result.logs : [];
+                
+                const tbody = document.querySelector('#log-table tbody');
+                tbody.innerHTML = '';
+                logs.forEach(log => {
+                    const row = `<tr><td>${log.log_date}</td><td>${log.log_time}</td><td>${log.category}</td></tr>`;
+                    tbody.innerHTML += row;
+                });
+
+                // Generate chart
+                const segmentCounts = {};
+                logs.forEach(log => {
+                    segmentCounts[log.category] = (segmentCounts[log.category] || 0) + 1;
+                });
+                const labels = Object.keys(segmentCounts);
+                const data = Object.values(segmentCounts);
+
+                const ctx = document.getElementById('chart').getContext('2d');
+                if (currentChart) {
+                    currentChart.destroy();
+                }
+                currentChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Jumlah To-Do',
+                            data: data,
+                            backgroundColor: ['#6366f1', '#ec4899', '#f59e0b', '#ef4444', '#10b981', '#06b6d4', '#8b5cf6', '#14b8a6'],
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        window.addEventListener('load', () => {
+            showView('todo');
+        });
+
+        // ============ LEARNING PROGRESS ============
+        let learningCharts = {};
+
+        async function loadLearningProgress() {
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                const response = await fetch(`${API_URL}?action=get_learning_progress`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    renderLearningProgress(result.progress || []);
+                } else {
+                    renderLearningEmpty();
+                }
+            } catch (error) {
+                console.error('Error loading learning progress:', error);
+                renderLearningEmpty();
+            }
+        }
+
+        function renderLearningProgress(progress) {
+            const container = document.getElementById('learning-progress-container');
+            const topicsContainer = document.getElementById('learning-topics-container');
+            
+            if (!progress || progress.length === 0) {
+                container.innerHTML = '<div class="learning-empty-state"><div class="learning-empty-state-icon">📭</div><div class="learning-empty-state-text">Belum ada progress pembelajaran</div></div>';
+                topicsContainer.innerHTML = '<div class="learning-empty-state"><div class="learning-empty-state-icon">📚</div><div class="learning-empty-state-text">Mulai dengan menambahkan catatan pembelajaran!</div></div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            const languageEmojis = {
+                'PHP': '🐘',
+                'JavaScript': '⚙️',
+                'HTML': '📄',
+                'CSS': '🎨',
+                'Laravel': '🚀'
+            };
+
+            progress.forEach((item, index) => {
+                const emoji = languageEmojis[item.language] || '📚';
+                const card = document.createElement('div');
+                card.className = 'learning-card';
+                card.innerHTML = `
+                    <div class="learning-card-title">${emoji} ${item.language}</div>
+                    <div class="learning-chart-wrapper">
+                        <canvas id="learning-chart-${index}"></canvas>
+                    </div>
+                    <div class="learning-percentage-text">${item.progress_percentage}%</div>
+                    <div class="learning-category-text">${item.category}</div>
+                    <div class="learning-card-actions">
+                        <button class="learning-edit-btn" onclick="editLearningProgress(${item.id})">✏️ Edit</button>
+                        <button class="learning-delete-btn" onclick="deleteLearningProgress(${item.id})">🗑️ Hapus</button>
+                    </div>
+                `;
+                container.appendChild(card);
+
+                // Render ring chart
+                setTimeout(() => {
+                    renderRingChart(index, item.language, item.progress_percentage);
+                }, 100);
+            });
+
+            // Render topics
+            renderLearningTopics(progress);
+        }
+
+        function renderRingChart(index, language, percentage) {
+            const ctx = document.getElementById(`learning-chart-${index}`);
+            if (!ctx) return;
+
+            const colorMap = {
+                'PHP': '#6366f1',
+                'JavaScript': '#ec4899',
+                'HTML': '#f59e0b',
+                'CSS': '#10b981',
+                'Laravel': '#8b5cf6'
+            };
+
+            const color = colorMap[language] || '#6366f1';
+            const remaining = 100 - percentage;
+
+            if (learningCharts[index]) {
+                learningCharts[index].destroy();
+            }
+
+            learningCharts[index] = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [percentage, remaining],
+                        backgroundColor: [color, '#e2e8f0'],
+                        borderColor: ['#ffffff', '#ffffff'],
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+        }
+
+        function renderLearningTopics(progress) {
+            const container = document.getElementById('learning-topics-container');
+            let html = '';
+
+            const groupedByLanguage = {};
+            progress.forEach(item => {
+                if (!groupedByLanguage[item.language]) {
+                    groupedByLanguage[item.language] = [];
+                }
+                groupedByLanguage[item.language] = item.topics_learned || [];
+            });
+
+            const languageEmojis = {
+                'PHP': '🐘',
+                'JavaScript': '⚙️',
+                'HTML': '📄',
+                'CSS': '🎨',
+                'Laravel': '🚀'
+            };
+
+            for (const [language, topics] of Object.entries(groupedByLanguage)) {
+                const emoji = languageEmojis[language] || '📚';
+                html += `
+                    <div class="learning-language-section">
+                        <h3>${emoji} ${language}</h3>
+                        <div class="learning-topics-list">
+                            ${topics.length > 0 ? topics.map(topic => `<span class="learning-topic-badge">${topic}</span>`).join('') : '<span style="color: #94a3b8;">Belum ada topik</span>'}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html || '<div class="learning-empty-state"><div class="learning-empty-state-icon">📚</div><div class="learning-empty-state-text">Belum ada topik yang terditeksi</div></div>';
+        }
+
+        function renderLearningEmpty() {
+            document.getElementById('learning-progress-container').innerHTML = '<div class="learning-empty-state"><div class="learning-empty-state-icon">📭</div><div class="learning-empty-state-text">Belum ada progress pembelajaran</div></div>';
+            document.getElementById('learning-topics-container').innerHTML = '<div class="learning-empty-state"><div class="learning-empty-state-icon">📚</div><div class="learning-empty-state-text">Mulai dengan menambahkan catatan pembelajaran!</div></div>';
+        }
+
+        document.getElementById('learning-form')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const language = document.getElementById('learning-language').value;
+            const category = document.getElementById('learning-category').value;
+            const notes = document.getElementById('learning-notes').value;
+            const percentage = parseInt(document.getElementById('learning-percentage').value);
+            const token = localStorage.getItem('authToken');
+
+            if (!language || !category || percentage < 0 || percentage > 100) {
+                alert('Semua field harus diisi dengan benar');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}?action=update_learning_progress`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        language: language,
+                        category: category,
+                        percentage: percentage,
+                        notes: notes
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert(`✅ Progress disimpan! Topik terdeteksi: ${result.topics_detected.join(', ') || 'Tidak ada'}`);
+                    this.reset();
+                    loadLearningProgress();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error menyimpan progress: ' + error.message);
+            }
+        });
+
+        function editLearningProgress(id) {
+            alert('Feature edit akan segera datang!');
+        }
+
+        async function deleteLearningProgress(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus progress ini?')) return;
+            
+            alert('Feature delete akan segera datang!');
+        }
+
+        window.addEventListener('load', () => {
+            showView('todo');
+        });
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeCategoryModal();
+            }
+        });
+
+        // ============ MODAL CLOSE ON OUTSIDE CLICK ============
+        document.getElementById('category-modal')?.addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeCategoryModal();
+            }
+        });
+    </script>
+</body>
+</html>

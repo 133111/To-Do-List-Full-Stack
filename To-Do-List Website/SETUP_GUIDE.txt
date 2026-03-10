@@ -1,0 +1,143 @@
+════════════════════════════════════════════════════════════════════════════════
+                    🔧 SETUP & TROUBLESHOOTING GUIDE
+════════════════════════════════════════════════════════════════════════════════
+
+✅ API SUDAH DIPERBAIKI - Versi yang lebih reliable!
+
+════════════════════════════════════════════════════════════════════════════════
+📋 LANGKAH SETUP (5 MENIT)
+════════════════════════════════════════════════════════════════════════════════
+
+STEP 1: Buka phpMyAdmin
+   URL: http://localhost/phpmyadmin
+   
+STEP 2: Hapus database lama (optional)
+   - Di sidebar kiri, klik database "todo_list"
+   - Klik tab "Operations"
+   - Scroll ke bawah → "Delete the database" → Klik "Drop"
+   - Konfirmasi: "Yes"
+
+STEP 3: Buat database baru
+   - Di phpMyAdmin, klik "New" (atau "Create new database")
+   - Nama: todo_list
+   - Collation: utf8mb4_unicode_ci
+   - Klik "Create"
+
+STEP 4: Import db_setup.sql
+   - Pilih database "todo_list" di sidebar
+   - Klik tab "SQL"
+   - Copy semua isi file: db_setup.sql
+   - Paste ke text area
+   - Klik "Go"
+   - ✅ Tunggu sampai berhasil
+
+STEP 5: Setup test accounts
+   - Masih di tab SQL
+   - Copy semua isi file: setup_accounts.sql
+   - Paste ke text area (ganti yang lama)
+   - Klik "Go"
+   - ✅ Tunggu sampai berhasil
+
+STEP 6: Verifikasi akun
+   - Di phpMyAdmin, buka tabel "users"
+   - Lihat harusnya ada 2 user: admin & tester
+   - Buka tabel "sessions"
+   - Lihat harusnya ada 2 token
+
+════════════════════════════════════════════════════════════════════════════════
+🔑 CREDENTIALS READY TO USE
+════════════════════════════════════════════════════════════════════════════════
+
+ADMIN:
+  Username: admin
+  Password: admin123
+
+TESTER:
+  Username: tester
+  Password: tester123
+
+TOKENS (generated in database):
+  Admin Token: admin_token_1234567890abcdefghijklmnopqrstuvwxyz123456789
+  Tester Token: tester_token_abcdefghijklmnopqrstuvwxyz1234567890123456
+
+════════════════════════════════════════════════════════════════════════════════
+🧪 TEST SEKARANG
+════════════════════════════════════════════════════════════════════════════════
+
+LOGIN PAGE:
+  URL: http://localhost/To-Do-List Website/login.html
+  User: admin
+  Pass: admin123
+
+API TESTER:
+  URL: http://localhost/To-Do-List Website/API_TESTING.html
+  User: admin
+  Pass: admin123
+
+Kalau berhasil login:
+  ✅ Bisa buat todo
+  ✅ Bisa buat log
+  ✅ Data tersimpan di database
+  ✅ Logout & login lagi → data masih ada
+
+════════════════════════════════════════════════════════════════════════════════
+🐛 TROUBLESHOOTING
+════════════════════════════════════════════════════════════════════════════════
+
+PROBLEM: "Username tidak ditemukan"
+SOLUSI:
+  1. Pastikan setup_accounts.sql sudah dijalankan
+  2. Di phpMyAdmin, tabel users, cek ada data admin?
+  3. Kalau kosong, jalankan setup_accounts.sql lagi
+
+PROBLEM: "Database Connection Failed"
+SOLUSI:
+  1. Pastikan MySQL service running (Services > MySQL80 > Running)
+  2. Di Windows, tekan: Services (win+r → services.msc)
+  3. Cari "MySQL80" → klik kanan → Start
+  4. Tunggu sampai status: Running
+  5. Refresh browser
+
+PROBLEM: "Token required" di API
+SOLUSI:
+  1. Pastikan sudah login terlebih dahulu
+  2. Cek browser console (F12 → Console)
+  3. Pastikan token tersimpan di localStorage
+  4. Coba logout → login lagi
+
+PROBLEM: "Data tidak tersimpan"
+SOLUSI:
+  1. Di API_TESTING.html, test "Add Todo" atau "Add Log"
+  2. Lihat response JSON - ada error?
+  3. Cek di phpMyAdmin tabel todos/activity_logs - ada data?
+  4. Kalau mau, share error message-nya
+
+════════════════════════════════════════════════════════════════════════════════
+✅ CHECKLIST SUKSES
+════════════════════════════════════════════════════════════════════════════════
+
+Setelah setup selesai, pastikan:
+
+□ Database "todo_list" ada di phpMyAdmin
+□ Tabel ada 4: users, todos, activity_logs, sessions
+□ Tabel users ada 2 record: admin & tester
+□ Tabel sessions ada 2 record dengan token
+□ Bisa login di login.html dengan admin/admin123
+□ Bisa access API_TESTING.html
+□ Bisa add todo & log
+□ Data tersimpan di database
+□ Logout & login lagi → data masih ada
+
+Kalau semua ✅, project SIAP DIGUNAKAN! 🎉
+
+════════════════════════════════════════════════════════════════════════════════
+📞 FILE YANG SUDAH DIPERBAIKI
+════════════════════════════════════════════════════════════════════════════════
+
+✅ api.php - Versi baru yang lebih reliable & simple
+✅ setup_accounts.sql - Setup akun yang mudah
+✅ login.html - Sudah integrated dengan API baru
+✅ index.html - Sudah integrated dengan API baru
+✅ API_TESTING.html - Ready untuk test
+
+════════════════════════════════════════════════════════════════════════════════

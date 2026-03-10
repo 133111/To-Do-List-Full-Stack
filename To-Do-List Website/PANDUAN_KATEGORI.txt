@@ -1,0 +1,308 @@
+# 📚 PANDUAN PENGGUNA: KATEGORI DINAMIS TO-DO LIST
+
+## 🎯 Apa Itu Kategori Dinamis?
+
+Kategori dinamis adalah fitur baru yang memungkinkan Anda untuk:
+- **Membuat** kategori/workspace baru sesuai kebutuhan
+- **Mengedit** nama dan emoji kategori kapan saja
+- **Menghapus** kategori yang tidak dipakai lagi
+- **Mengorganisir** task Anda dengan lebih fleksibel
+
+Sebelumnya, kategori seperti "Pelajaran Sekolah", "Pemrograman Website" sudah ditentukan sebelumnya. 
+Sekarang, **Anda yang menentukan kategori apa yang ingin Anda buat!**
+
+---
+
+## 🚀 Panduan Cara Menggunakan
+
+### 1️⃣ MEMBUAT KATEGORI BARU
+
+**Langkah-langkah:**
+
+1. Buka halaman To-Do List Anda
+2. Cari tombol **"+ Tambah Kategori"** di bagian atas (berwarna hijau)
+3. Klik tombol tersebut
+4. Sebuah jendela modal akan muncul:
+
+```
+┌────────────────────────────────────────┐
+│ Tambah Kategori Baru            [✕]   │
+├────────────────────────────────────────┤
+│                                        │
+│ Masukkan nama kategori...             │
+│ [_________________________]            │
+│                                        │
+│ Emoji atau icon (opsional)            │
+│ [📝]                                   │
+│                                        │
+│          [Batal]  [Simpan]             │
+└────────────────────────────────────────┘
+```
+
+5. Isi nama kategori (contoh: "Coding", "Olahraga", "Belanja")
+6. Pilih emoji yang sesuai (contoh: 💻, ⚽, 🛒)
+   - Jika tidak mengisi emoji, default akan menggunakan 📝
+7. Klik tombol **"Simpan"**
+8. Kategori baru Anda akan langsung muncul di halaman!
+
+**Contoh kategori yang bisa Anda buat:**
+- 🎓 Pelajaran Sekolah
+- 💻 Coding Projects
+- 🏃 Fitness & Olahraga
+- 🎮 Gaming & Hobi
+- 📚 Membaca & Pembelajaran
+- 🏠 Rumah Tangga
+- 💼 Pekerjaan
+- 🎨 Kreatif
+
+---
+
+### 2️⃣ MENAMBAH TASK DALAM KATEGORI
+
+Setelah membuat kategori, setiap kategori akan menampilkan:
+
+```
+┌──────────────────────────────────────────┐
+│ 💻 Coding Projects  [✏️] [🗑️]             │
+├──────────────────────────────────────────┤
+│ [Input task...]               [Tambah]   │
+├──────────────────────────────────────────┤
+│ ☑ Task 1                         [Hapus] │
+│ ☐ Task 2                         [Hapus] │
+└──────────────────────────────────────────┘
+```
+
+**Cara menambah task:**
+1. Ketik nama task di field input (contoh: "Buat login page")
+2. Klik tombol **"Tambah"** atau tekan Enter
+3. Task Anda akan langsung muncul di list
+
+**Cara menyelesaikan task:**
+1. Centang checkbox di sebelah kiri task
+2. Task akan berubah warna (abu-abu) dan tercoret
+3. Status sudah tersimpan di database
+
+**Cara menghapus task:**
+1. Klik tombol **"Hapus"** di sebelah kanan task
+2. Konfirmasi penghapusan
+3. Task akan langsung dihapus
+
+---
+
+### 3️⃣ MENGEDIT KATEGORI
+
+Jika ingin mengubah nama atau emoji kategori:
+
+**Langkah-langkah:**
+1. Cari kategori yang ingin diedit
+2. Klik tombol **"✏️ Edit"** (warna kuning)
+3. Modal akan muncul dengan data kategori lama
+4. Ubah nama dan/atau emoji sesuai keinginan
+5. Klik **"Simpan"**
+6. Perubahan akan langsung diterapkan
+
+**Catatan:**
+- Task dalam kategori tidak akan hilang saat edit
+- Hanya nama dan emoji yang berubah
+
+---
+
+### 4️⃣ MENGHAPUS KATEGORI
+
+Jika ingin menghapus kategori yang tidak dipakai:
+
+**Langkah-langkah:**
+1. Cari kategori yang ingin dihapus
+2. Klik tombol **"🗑️ Hapus"** (warna merah)
+3. Konfirmasi akan muncul:
+   ```
+   Apakah Anda yakin ingin menghapus kategori ini? 
+   Semua task di kategori ini akan dihapus.
+   ```
+4. Klik **"OK"** untuk confirm atau **"Cancel"** untuk batal
+5. Jika dikonfirmasi, kategori dan **SEMUA task di dalamnya akan dihapus selamanya**
+
+**⚠️ PERINGATAN:**
+- Penghapusan kategori tidak bisa di-undo!
+- Semua task dalam kategori akan ikut terhapus
+- Pastikan Anda benar-benar ingin menghapusnya
+
+---
+
+## 📊 DASHBOARD & LOG AKTIVITAS
+
+### Melihat Statistik di Dashboard
+
+1. Klik tab **"📊 Dashboard"** di sidebar
+2. Anda akan melihat:
+   - **Data Log Aktivitas**: Tabel semua aktivitas yang Anda catat
+   - **Grafik Jumlah To-Do**: Chart yang menampilkan statistik per kategori
+
+### Mencatat Aktivitas Log
+
+Di bagian bawah halaman To-Do List, ada form **"Log Aktivitas To-Do"**:
+
+```
+Tanggal:    [2026-02-27]
+Jam:        [14:30]
+Segmen:     [Pilih Kategori ▼]
+            [Simpan Log]
+```
+
+Cara menggunakan:
+1. Pilih tanggal aktivitas (bisa hari ini atau hari sebelumnya)
+2. Pilih jam aktivitas
+3. Pilih kategori/segmen yang Anda kerjakan
+4. Klik **"Simpan Log"**
+5. Log Anda akan tersimpan dan muncul di Dashboard
+
+---
+
+## 💡 TIPS & BEST PRACTICES
+
+### Tips Mengorganisir Kategori
+
+1. **Gunakan nama yang deskriptif**
+   - ✅ Baik: "Proyek Web Development" 
+   - ❌ Buruk: "Pekerjaan" atau "Project"
+
+2. **Pilih emoji yang relevan**
+   - 🎓 Untuk pelajaran/akademik
+   - 💻 Untuk coding/tech
+   - 🏃 Untuk fitness/olahraga
+   - 🛒 Untuk belanja
+   - 🎨 Untuk kreatif
+
+3. **Jangan buat terlalu banyak kategori**
+   - 5-10 kategori sudah cukup untuk organisasi yang baik
+   - Terlalu banyak kategori bisa membingungkan
+
+4. **Update kategori secara berkala**
+   - Hapus kategori yang sudah selesai
+   - Edit nama jika kategori berubah fokus
+
+### Tips Mencatat Log Aktivitas
+
+1. **Catat setiap hari**
+   - Ini membantu tracking progress Anda
+   - Lihat di Dashboard untuk melihat pola kerja
+
+2. **Catat pada jam yang tepat**
+   - Jika Anda mulai kerja pukul 09:00, catat 09:00
+   - Jika sudah selesai pukul 17:00, catat lagi
+
+3. **Gunakan dashboard untuk insight**
+   - Lihat kategori mana yang paling banyak Anda kerjakan
+   - Analisis produktivitas Anda dari grafik
+
+---
+
+## 🎨 INTERFACE ELEMENTS
+
+Berikut adalah tombol-tombol dan elemen UI yang akan Anda temui:
+
+| Icon | Nama | Fungsi |
+|------|------|--------|
+| ➕ | Tambah | Menambah task baru |
+| ☑️ | Checkbox | Menandai task selesai |
+| ✏️ | Edit | Mengubah kategori |
+| 🗑️ | Hapus | Menghapus kategori/task |
+| ✕ | Close | Menutup modal |
+| 📝 | Emoji | Icon kategori |
+
+---
+
+## ❓ PERTANYAAN YANG SERING DIAJUKAN
+
+### Q: Apakah saya bisa membuat kategori dengan nama yang sama?
+**A:** Tidak. Setiap user tidak boleh memiliki 2 kategori dengan nama yang sama. Namun, user lain tetap bisa membuat kategori dengan nama yang sama.
+
+### Q: Bagaimana jika saya menghapus kategori secara tidak sengaja?
+**A:** Sayang sekali, penghapusan kategori tidak bisa di-undo. Anda harus membuat kategori baru dan menambah task lagi. 
+Untuk mencegah ini, selalu lihat konfirmasi penghapusan dengan teliti.
+
+### Q: Bisakah saya mengubah kategori dari sebuah task?
+**A:** Saat ini, fitur ini belum tersedia. Task hanya bisa dihapus dan ditambah kembali ke kategori yang berbeda.
+Fitur ini mungkin akan ditambahkan di versi mendatang.
+
+### Q: Berapa maksimal kategori yang bisa saya buat?
+**A:** Tidak ada batasan hard limit. Namun, rekomendasi adalah 5-10 kategori untuk organisasi yang optimal.
+
+### Q: Apakah data saya aman?
+**A:** Ya, data Anda tersimpan di database MySQL yang aman. Data Anda tidak bisa diakses oleh user lain.
+Setiap user hanya bisa melihat kategori dan task mereka sendiri.
+
+### Q: Bisakah saya export kategori dan task saya?
+**A:** Fitur export belum tersedia saat ini. Tapi Anda bisa screenshot atau mencatat di tempat lain.
+
+---
+
+## 🔐 KEAMANAN & PRIVASI
+
+### Perlindungan Data
+- ✅ Setiap data diasosiasikan dengan user_id Anda
+- ✅ User lain tidak bisa melihat kategori/task Anda
+- ✅ Password Anda di-hash dengan bcrypt (aman)
+- ✅ Session Anda di-protect dengan token
+
+### Best Practice
+1. **Jangan share token Anda** dengan siapa pun
+2. **Logout jika selesai** menggunakan aplikasi di perangkat public
+3. **Gunakan password yang kuat** (minimal 6 karakter)
+
+---
+
+## 🆘 TROUBLESHOOTING
+
+### Masalah: Kategori tidak muncul setelah dibuat
+**Solusi:**
+1. Refresh halaman (Ctrl + R)
+2. Clear cache browser (Ctrl + Shift + Delete)
+3. Coba buat kategori lagi
+4. Check browser console (F12) untuk error message
+
+### Masalah: Tidak bisa login setelah update
+**Solusi:**
+1. Pastikan database sudah diupdate
+2. Clear browser cookies
+3. Restart server
+4. Coba login dengan username/password yang benar
+
+### Masalah: Task tidak tersimpan
+**Solusi:**
+1. Check internet connection Anda
+2. Buka DevTools (F12) → Network tab
+3. Cek apakah API call gagal
+4. Refresh halaman dan coba lagi
+
+### Masalah: Modal tidak bisa ditutup
+**Solusi:**
+1. Tekan tombol ESC di keyboard
+2. Atau klik di luar modal
+3. Atau klik tombol [✕] di pojok kanan atas
+
+---
+
+## 📞 HUBUNGI SUPPORT
+
+Jika Anda menemukan bug atau masalah:
+1. Buka DevTools (F12)
+2. Catat error message di Console
+3. Screenshot error
+4. Hubungi developer dengan informasi tersebut
+
+---
+
+## 🎉 NIKMATI FITUR BARU!
+
+Sekarang Anda memiliki sistem organisasi to-do yang powerful dan fleksibel!
+
+Tips terakhir: **Mulai kecil, mulai sederhana**. Buat 3-4 kategori utama dulu, dan perlahan tambah sesuai kebutuhan.
+
+---
+
+**Versi:** 2.0 (Dynamic Categories)  
+**Tanggal Update:** Februari 27, 2026  
+**Bahasa:** Bahasa Indonesia
+
+Selamat menggunakan! 🚀✨
